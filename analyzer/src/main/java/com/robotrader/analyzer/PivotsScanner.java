@@ -6,6 +6,8 @@ package com.robotrader.analyzer;
 
 import com.robotrader.core.factor.Candle;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -13,7 +15,8 @@ import java.math.BigDecimal;
  */
 public class PivotsScanner {    
     private Candle lastCandle = null;
-    private boolean up = false;    
+    private boolean up = false;
+    private Set<Pivot> pivots = new HashSet<>();
     
     public void add(Candle candle) {
         if(lastCandle == null) {            
@@ -26,7 +29,7 @@ public class PivotsScanner {
             
             lastCandle = candle;
             
-            logPivot();
+            addPivot();
         } else {
             boolean directionChanged = false;
             if(up) {
@@ -48,16 +51,19 @@ public class PivotsScanner {
             }
             
             if(directionChanged) {
-                logPivot();
+                addPivot();
             }
             
             lastCandle = candle;
         }
     }
 
-    private void logPivot() {
-        String direction = up?" UP ": " DOWN ";
-        BigDecimal value = up?lastCandle.getMinValue():lastCandle.getMaxValue();
-        System.out.println("Pivot " + direction + " AT " + lastCandle.getDate() + " FROM " + value);
+    private void addPivot() {        
+        BigDecimal value = up?lastCandle.getMinValue():lastCandle.getMaxValue();        
+        pivots.add(new Pivot(lastCandle.getDate(), value, up));
+    }
+    
+    public Set<Pivot> getPivots() {
+        return pivots;
     }
 }

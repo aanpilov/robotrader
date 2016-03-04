@@ -27,5 +27,11 @@ public class PivotsScannerTest {
         for(Date date : storage.getDates()) {
             scanner.add(storage.getBar(date));
         }
+        
+        for(Pivot pivot : scanner.getPivots()) {
+            System.out.println(pivot);
+        }
+        
+        
     }
 }
