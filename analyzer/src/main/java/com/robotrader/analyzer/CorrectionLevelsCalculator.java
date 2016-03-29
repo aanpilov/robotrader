@@ -32,10 +32,10 @@ public class CorrectionLevelsCalculator {
             tDirection = -1;
         }
         
-        retLevels.add(b - tDirection * tMod * 0.382);
-        retLevels.add(b - tDirection * tMod * 0.5);
-        retLevels.add(b - tDirection * tMod * 0.618);
-        retLevels.add(b - tDirection * tMod * 0.786);
+        retLevels.add(finish - tDirection * tMod * 0.382);
+        retLevels.add(finish - tDirection * tMod * 0.5);
+        retLevels.add(finish - tDirection * tMod * 0.618);
+        retLevels.add(finish - tDirection * tMod * 0.786);
         
         aLevels.add(b - tDirection * aMod * 0.618);
         aLevels.add(b - tDirection * aMod);
