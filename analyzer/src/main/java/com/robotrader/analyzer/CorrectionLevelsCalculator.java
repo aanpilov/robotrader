@@ -18,6 +18,33 @@ import java.util.TreeSet;
  * @author aanpilov
  */
 public class CorrectionLevelsCalculator {
+    private static void calculateTLevels(double start, double v1, double v2, double v3, double v4) {
+        SortedSet<Double> firstLevels=  new TreeSet<>();
+        SortedSet<Double> thirdLevels=  new TreeSet<>();
+        SortedSet<Double> fourthLevels=  new TreeSet<>();
+        
+        double firstMod = Math.abs(v1 - start);
+        double thirdMod = Math.abs(v3 - start);
+        double fourthMod = Math.abs(v4 - v3);
+        
+        double tDirection = 1;
+        if(v4 < start) {
+            tDirection = -1;
+        }
+        
+        firstLevels.add(v4 + tDirection * firstMod * 1);
+        
+        thirdLevels.add(v4 + tDirection * thirdMod * 0.382);
+        thirdLevels.add(v4 + tDirection * thirdMod * 0.618);
+        thirdLevels.add(v4 + tDirection * thirdMod * 1);
+        
+        fourthLevels.add(v4 + tDirection * fourthMod * 1.27);
+        fourthLevels.add(v4 + tDirection * fourthMod * 1.618);
+        fourthLevels.add(v4 + tDirection * fourthMod * 2.618);
+        
+        nearestPoints(firstLevels, thirdLevels, fourthLevels);
+    }
+    
     private static void calculate(double start, double finish, double a, double b) {
         SortedSet<Double> retLevels=  new TreeSet<>();
         SortedSet<Double> aLevels=  new TreeSet<>();
@@ -83,6 +110,7 @@ public class CorrectionLevelsCalculator {
     }
     
     public static void main(String[] args) {
-        calculate(109.2, 105.4, 107.8, 106.7);        
+//        calculate(109.2, 105.4, 107.8, 106.7);        
+        calculateTLevels(82.2, 98.7, 92.7, 114.19, 105.35);
     }
 }
