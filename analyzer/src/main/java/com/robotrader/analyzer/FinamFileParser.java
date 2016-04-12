@@ -23,7 +23,7 @@ import org.apache.commons.csv.CSVRecord;
  * @author aanpilov
  */
 public class FinamFileParser {
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd hh:mm:ss");
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
     private Paper paper;
     private Interval interval;
 
