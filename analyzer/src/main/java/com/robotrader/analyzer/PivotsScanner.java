@@ -6,6 +6,7 @@ package com.robotrader.analyzer;
 
 import com.robotrader.core.factor.Candle;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,11 @@ public class PivotsScanner {
     private boolean up = false;
     private List<Pivot> pivots = new ArrayList<>();
     
-    public void add(Candle candle) {
+    public void add(Candle candle) throws Exception {
+        if(candle.getDate().compareTo(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").parse("02.02.2016 10:00:00")) == 0) {
+                System.out.println("Start debug...");
+        }
+        
         if(lastCandle == null) {            
             //first candle
             if(candle.getOpenValue().compareTo(candle.getCloseValue()) == -1) {
@@ -30,27 +35,33 @@ public class PivotsScanner {
             lastCandle = candle;
             
             addPivot();
-        } else {
-            boolean directionChanged = false;
+        } else {            
             if(up) {
-                if(candle.getMinValue().doubleValue() < lastCandle.getMinValue().doubleValue()) {
-                    directionChanged = true;
-                    up = false;
+                if(candle.getMinValue().doubleValue() < lastCandle.getMinValue().doubleValue()) {                    
+                    up = false;   
+                    if(candle.getMaxValue().doubleValue() >= lastCandle.getMaxValue().doubleValue()) {
+                        lastCandle = candle;
+                        addPivot();
+                    } else {
+                        addPivot();
+                        lastCandle = candle;
+                    }
                 } else if(candle.getMaxValue().doubleValue() >= lastCandle.getMaxValue().doubleValue()) {
                     lastCandle = candle;
                 }
             }else {
-                if(candle.getMaxValue().doubleValue() > lastCandle.getMaxValue().doubleValue()) {
-                    directionChanged = true;
-                    up = true;
+                if(candle.getMaxValue().doubleValue() > lastCandle.getMaxValue().doubleValue()) {                    
+                    up = true;      
+                    if(candle.getMinValue().doubleValue() <= lastCandle.getMinValue().doubleValue()) {
+                        lastCandle = candle;
+                        addPivot();
+                    } else {
+                        addPivot();
+                        lastCandle = candle;
+                    }                    
                 } else if(candle.getMinValue().doubleValue() <= lastCandle.getMinValue().doubleValue()) {
                     lastCandle = candle;
                 }
-            }
-            
-            if(directionChanged) {
-                addPivot();
-                lastCandle = candle;
             }
         }
     }
