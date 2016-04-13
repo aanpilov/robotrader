@@ -7,9 +7,7 @@ package com.robotrader.analyzer;
 import com.robotrader.core.factor.Candle;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -38,25 +36,22 @@ public class PivotsScanner {
                 if(candle.getMinValue().doubleValue() < lastCandle.getMinValue().doubleValue()) {
                     directionChanged = true;
                     up = false;
-                }
-                if(candle.getMaxValue().doubleValue() >= lastCandle.getMaxValue().doubleValue()) {
+                } else if(candle.getMaxValue().doubleValue() >= lastCandle.getMaxValue().doubleValue()) {
                     lastCandle = candle;
                 }
             }else {
                 if(candle.getMaxValue().doubleValue() > lastCandle.getMaxValue().doubleValue()) {
                     directionChanged = true;
                     up = true;
-                }
-                if(candle.getMinValue().doubleValue() <= lastCandle.getMinValue().doubleValue()) {
+                } else if(candle.getMinValue().doubleValue() <= lastCandle.getMinValue().doubleValue()) {
                     lastCandle = candle;
                 }
             }
             
             if(directionChanged) {
                 addPivot();
+                lastCandle = candle;
             }
-            
-            lastCandle = candle;
         }
     }
 
