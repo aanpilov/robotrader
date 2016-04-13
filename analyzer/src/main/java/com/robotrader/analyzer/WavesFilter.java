@@ -5,7 +5,6 @@
 package com.robotrader.analyzer;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 
 /**
  *
@@ -20,10 +19,6 @@ public class WavesFilter {
         Wave cWave = null;
 
         for (Wave wave : storage.getWaves()) {
-            if(wave.getEndDate().compareTo(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").parse("26.01.2016 11:00:00")) == 0) {
-                System.out.println("Start debug...");
-            }
-            
             if (tWave == null) {
                 tWave = wave;
                 
@@ -38,13 +33,6 @@ public class WavesFilter {
 
             if (wave.isUp() == tWave.isUp()) {
                 if (tWave.isUp() && (wave.getEndValue().compareTo(tWave.getEndValue()) >= 0)) {
-                    if(cWave.getMod().compareTo(tWave.getMod().multiply(new BigDecimal("0.382"))) >= 0) {
-                        result.addPivot(new Pivot(tWave.getEndDate(), tWave.getEndValue(), tWave.isUp()));
-                        result.addPivot(new Pivot(cWave.getEndDate(), cWave.getEndValue(), cWave.isUp()));
-                        
-                        tWave = new Wave(cWave.getEndDate(), cWave.getEndValue(), wave.getEndDate(), wave.getEndValue());
-                    }
-                    
                     tWave.setEndDate(wave.getEndDate());
                     tWave.setEndValue(wave.getEndValue());
                     
@@ -52,14 +40,7 @@ public class WavesFilter {
                     continue;
                 }
 
-                if (!tWave.isUp() && (wave.getEndValue().compareTo(tWave.getEndValue()) <= 0)) {
-                    if(cWave.getMod().compareTo(tWave.getMod().multiply(new BigDecimal("0.382"))) >= 0) {
-                        result.addPivot(new Pivot(tWave.getEndDate(), tWave.getEndValue(), tWave.isUp()));
-                        result.addPivot(new Pivot(cWave.getEndDate(), cWave.getEndValue(), cWave.isUp()));
-                        
-                        tWave = new Wave(cWave.getEndDate(), cWave.getEndValue(), wave.getEndDate(), wave.getEndValue());
-                    }
-                    
+                if (!tWave.isUp() && (wave.getEndValue().compareTo(tWave.getEndValue()) <= 0)) {//                    
                     tWave.setEndDate(wave.getEndDate());
                     tWave.setEndValue(wave.getEndValue());
 
@@ -79,7 +60,7 @@ public class WavesFilter {
                     cWave.setEndValue(wave.getEndValue());
                 }
 
-                if (cWave.getMod().compareTo(tWave.getMod()) >= 0) {                    
+                if(cWave.getMod().compareTo(tWave.getMod().multiply(new BigDecimal("0.382"))) >= 0) {
                     result.addPivot(new Pivot(tWave.getEndDate(), tWave.getEndValue(), !tWave.isUp()));
 
                     tWave = cWave;

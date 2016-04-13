@@ -77,9 +77,9 @@ public class Application extends ApplicationFrame {
         WavesPlotter filteredWavesPlotter = new WavesPlotter(filteredWavesStorage.getWaves());
         
         Application demo = new Application("Candlestick Demo");
-//        demo.addDataset(plotter.getDataset(), plotter.getRenderer());
+        demo.addDataset(plotter.getDataset(), plotter.getRenderer());
 //        demo.addDataset(pivotsPlotter.getDataset(), pivotsPlotter.getRenderer());        
-        demo.addDataset(wavesPlotter.getDataset(), wavesPlotter.getRenderer());        
+//        demo.addDataset(wavesPlotter.getDataset(), wavesPlotter.getRenderer());        
         demo.addDataset(filteredWavesPlotter.getDataset(), filteredWavesPlotter.getRenderer());        
 
         demo.pack();
