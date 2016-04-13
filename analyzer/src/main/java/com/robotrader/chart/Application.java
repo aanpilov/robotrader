@@ -5,7 +5,10 @@
 package com.robotrader.chart;
 
 import com.robotrader.analyzer.FinamFileParser;
+import com.robotrader.analyzer.Pivot;
 import com.robotrader.analyzer.PivotsScanner;
+import com.robotrader.analyzer.WavesFilter;
+import com.robotrader.analyzer.WavesStorage;
 import com.robotrader.core.factor.CandleStorage;
 import com.robotrader.core.factor.Interval;
 import java.util.Date;
@@ -63,9 +66,21 @@ public class Application extends ApplicationFrame {
         }
         PivotsPlotter pivotsPlotter = new PivotsPlotter(scanner.getPivots());
         
+        WavesStorage wavesStorage = new WavesStorage();
+        for(Pivot pivot : scanner.getPivots()) {
+            wavesStorage.addPivot(pivot);
+        }
+        WavesPlotter wavesPlotter = new WavesPlotter(wavesStorage.getWaves());
+        
+        WavesFilter filter = new WavesFilter();
+        WavesStorage filteredWavesStorage = filter.filterCorrectionModule(wavesStorage);
+        WavesPlotter filteredWavesPlotter = new WavesPlotter(filteredWavesStorage.getWaves());
+        
         Application demo = new Application("Candlestick Demo");
-        demo.addDataset(plotter.getDataset(), plotter.getRenderer());
-        demo.addDataset(pivotsPlotter.getDataset(), pivotsPlotter.getRenderer());        
+//        demo.addDataset(plotter.getDataset(), plotter.getRenderer());
+//        demo.addDataset(pivotsPlotter.getDataset(), pivotsPlotter.getRenderer());        
+        demo.addDataset(wavesPlotter.getDataset(), wavesPlotter.getRenderer());        
+        demo.addDataset(filteredWavesPlotter.getDataset(), filteredWavesPlotter.getRenderer());        
 
         demo.pack();
         RefineryUtilities.centerFrameOnScreen(demo);
