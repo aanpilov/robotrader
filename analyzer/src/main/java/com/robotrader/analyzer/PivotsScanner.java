@@ -6,7 +6,9 @@ package com.robotrader.analyzer;
 
 import com.robotrader.core.factor.Candle;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -16,7 +18,7 @@ import java.util.Set;
 public class PivotsScanner {    
     private Candle lastCandle = null;
     private boolean up = false;
-    private Set<Pivot> pivots = new HashSet<>();
+    private List<Pivot> pivots = new ArrayList<>();
     
     public void add(Candle candle) {
         if(lastCandle == null) {            
@@ -63,7 +65,7 @@ public class PivotsScanner {
         pivots.add(new Pivot(lastCandle.getDate(), value, up));
     }
     
-    public Set<Pivot> getPivots() {
+    public List<Pivot> getPivots() {
         return pivots;
     }
 }

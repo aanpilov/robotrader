@@ -5,6 +5,7 @@
 package com.robotrader.chart;
 
 import com.robotrader.analyzer.Pivot;
+import java.util.List;
 import java.util.Set;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -18,9 +19,9 @@ import org.jfree.data.xy.XYDataset;
  * @author aanpilov
  */
 public class PivotsPlotter {
-    private Set<Pivot> pivots;
+    private List<Pivot> pivots;
 
-    public PivotsPlotter(Set<Pivot> pivots) {
+    public PivotsPlotter(List<Pivot> pivots) {
         this.pivots = pivots;
     }
     

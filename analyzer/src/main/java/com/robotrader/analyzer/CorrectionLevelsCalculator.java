@@ -34,13 +34,19 @@ public class CorrectionLevelsCalculator {
         
         firstLevels.add(v4 + tDirection * firstMod * 1);
         
+        System.out.println("firstLevels: " + firstLevels);
+        
         thirdLevels.add(v4 + tDirection * thirdMod * 0.382);
         thirdLevels.add(v4 + tDirection * thirdMod * 0.618);
         thirdLevels.add(v4 + tDirection * thirdMod * 1);
         
+        System.out.println("thirdLevels: " + thirdLevels);
+        
         fourthLevels.add(v4 + tDirection * fourthMod * 1.27);
         fourthLevels.add(v4 + tDirection * fourthMod * 1.618);
         fourthLevels.add(v4 + tDirection * fourthMod * 2.618);
+        
+        System.out.println("fourthLevels: " + fourthLevels);
         
         nearestPoints(firstLevels, thirdLevels, fourthLevels);
     }
@@ -110,7 +116,7 @@ public class CorrectionLevelsCalculator {
     }
     
     public static void main(String[] args) {
-//        calculate(109.2, 105.4, 107.8, 106.7);        
-        calculateTLevels(82.2, 98.7, 92.7, 114.19, 105.35);
+        calculate(106, 119.39, 115.82, 119.08);        
+//        calculateTLevels(85.96, 74.59, 80.63, 66.7, 69.49);
     }
 }
