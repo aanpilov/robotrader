@@ -20,46 +20,38 @@ public class PivotsScanner {
     private List<Pivot> pivots = new ArrayList<>();
     
     public void add(Candle candle) throws Exception {
-        if(candle.getDate().compareTo(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").parse("02.02.2016 10:00:00")) == 0) {
-                System.out.println("Start debug...");
-        }
-        
-        if(lastCandle == null) {            
+        if (lastCandle == null) {
             //first candle
-            if(candle.getOpenValue().compareTo(candle.getCloseValue()) == -1) {
+            if (candle.getOpenValue().compareTo(candle.getCloseValue()) == -1) {
                 up = true;
             } else {
                 up = false;
             }
-            
+
             lastCandle = candle;
-            
+
             addPivot();
-        } else {            
-            if(up) {
-                if(candle.getMinValue().doubleValue() < lastCandle.getMinValue().doubleValue()) {                    
-                    up = false;   
-                    if(candle.getMaxValue().doubleValue() >= lastCandle.getMaxValue().doubleValue()) {
-                        lastCandle = candle;
-                        addPivot();
-                    } else {
-                        addPivot();
-                        lastCandle = candle;
-                    }
-                } else if(candle.getMaxValue().doubleValue() >= lastCandle.getMaxValue().doubleValue()) {
+        } else {
+            if (up) {
+                if (candle.getMaxValue().compareTo(lastCandle.getMaxValue()) >= 0
+                        && candle.getMinValue().compareTo(lastCandle.getMinValue()) <= 0) {
+                    lastCandle = candle;
+                } else if (candle.getMaxValue().compareTo(lastCandle.getMaxValue()) >= 0) {
+                    lastCandle = candle;
+                } else if (candle.getMinValue().compareTo(lastCandle.getMinValue()) < 0) {
+                    up = false;
+                    addPivot();
                     lastCandle = candle;
                 }
-            }else {
-                if(candle.getMaxValue().doubleValue() > lastCandle.getMaxValue().doubleValue()) {                    
-                    up = true;      
-                    if(candle.getMinValue().doubleValue() <= lastCandle.getMinValue().doubleValue()) {
-                        lastCandle = candle;
-                        addPivot();
-                    } else {
-                        addPivot();
-                        lastCandle = candle;
-                    }                    
-                } else if(candle.getMinValue().doubleValue() <= lastCandle.getMinValue().doubleValue()) {
+            } else {
+                if (candle.getMinValue().compareTo(lastCandle.getMinValue()) <= 0
+                        && candle.getMaxValue().compareTo(lastCandle.getMaxValue()) >= 0) {
+                    lastCandle = candle;
+                } else if (candle.getMinValue().compareTo(lastCandle.getMinValue()) <= 0) {
+                    lastCandle = candle;
+                } else if (candle.getMaxValue().compareTo(lastCandle.getMaxValue()) > 0) {
+                    up = true;
+                    addPivot();
                     lastCandle = candle;
                 }
             }
@@ -72,6 +64,12 @@ public class PivotsScanner {
     }
     
     public List<Pivot> getPivots() {
-        return pivots;
+        List<Pivot> result = new ArrayList<>();
+        
+        result.addAll(pivots);
+        BigDecimal value = up?lastCandle.getMaxValue():lastCandle.getMinValue();        
+        result.add(new Pivot(lastCandle.getDate(), value, !up));        
+        
+        return result;
     }
 }

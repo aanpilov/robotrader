@@ -5,6 +5,7 @@
 package com.robotrader.analyzer;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -70,7 +71,9 @@ public class WavesFilter {
         }
         
         result.addPivot(new Pivot(tWave.getEndDate(), tWave.getEndValue(), tWave.isUp()));
-        result.addPivot(new Pivot(cWave.getEndDate(), cWave.getEndValue(), cWave.isUp()));
+        if(cWave != null) {
+            result.addPivot(new Pivot(cWave.getEndDate(), cWave.getEndValue(), cWave.isUp()));
+        }
         
         return result;
     }
