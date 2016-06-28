@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.robotrader.ru/enterprise/adapter"
+	xmlns:tns="http://www.robotrader.ru/enterprise/adapter" elementFormDefault="qualified">
+	
+	<complexType name="tCandle">
+		<attribute name="begin" type="dateTime"/>
+		<attribute name="end" type="dateTime"/>
+		<attribute name="open" type="double"/>
+		<attribute name="close" type="double"/>
+		<attribute name="high" type="double"/>
+		<attribute name="low" type="double"/>
+		<attribute name="volume" type="double"/>
+	</complexType>
+	
+	<simpleType name="tInterval">
+		<restriction base="string">
+			<enumeration value="ONE_DAY"/>
+			<enumeration value="ONE_WEEK"/>
+			<enumeration value="ONE_MONTH"/>
+		</restriction>
+	</simpleType>
+	
+	<complexType name="tSecurity">
+		<sequence>
+			<element name="securityCode" type="string"></element>
+		</sequence>
+	</complexType>
+	
+</schema>

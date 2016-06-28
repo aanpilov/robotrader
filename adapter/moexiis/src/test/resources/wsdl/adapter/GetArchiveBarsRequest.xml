@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:q0="http://www.robotrader.ru/enterprise/adapter/"
+                  xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"> 
+    <soapenv:Body> 
+        <q0:GetArchiveBars>
+            <q0:security>
+                <q0:securityCode>SBER</q0:securityCode>
+            </q0:security>
+            <q0:interval>ONE_DAY</q0:interval>
+            <q0:from>2016-02-01T00:00:00.000Z</q0:from>
+            <q0:to>2016-02-16T00:00:00.000Z</q0:to>
+        </q0:GetArchiveBars>
+    </soapenv:Body>  
+</soapenv:Envelope>  

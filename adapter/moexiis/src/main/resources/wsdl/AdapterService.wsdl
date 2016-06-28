@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://www.robotrader.ru/enterprise/adapter/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="AdapterService"
+	targetNamespace="http://www.robotrader.ru/enterprise/adapter/">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://www.robotrader.ru/enterprise/adapter/" elementFormDefault="qualified">
+			<xsd:include schemaLocation="./AdapterSchema.xsd"/>
+			<xsd:element name="GetArchiveBars">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="security" type="tns:tSecurity" />
+						<xsd:element name="interval" type="tns:tInterval" />
+						<xsd:element name="from" type="xsd:dateTime" />
+						<xsd:element name="to" type="xsd:dateTime" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GetArchiveBarsResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="candle" type="tns:tCandle" minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="GetArchiveBarsRequest">
+		<wsdl:part element="tns:GetArchiveBars" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="GetArchiveBarsResponse">
+		<wsdl:part element="tns:GetArchiveBarsResponse" name="parameters" />
+	</wsdl:message>
+	<wsdl:portType name="AdapterService">
+		<wsdl:operation name="GetArchiveBars">
+			<wsdl:input message="tns:GetArchiveBarsRequest" />
+			<wsdl:output message="tns:GetArchiveBarsResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="AdapterServiceSOAP" type="tns:AdapterService">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="GetArchiveBars">
+<!-- 			<soap:operation soapAction="http://www.example.org/AdapterService/NewOperation" /> -->
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="AdapterService">
+		<wsdl:port binding="tns:AdapterServiceSOAP" name="AdapterServiceSOAP">
+			<soap:address location="http://www.example.org/" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

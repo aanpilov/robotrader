@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+     
+     <bean id="mySqlDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+         <property name="url" value="jdbc:mysql://localhost/robotrader"/>
+         <property name="username" value="robotrader"/>
+         <property name="password" value="robotrader"/>
+     </bean>
+     
+     <bean id="sqlUtil" class="com.robotrader.core.util.sql.SqlUtilImpl">
+         <property name="dataSource" ref="mySqlDataSource"/>
+     </bean>
+     
+     <bean id="jaxbUtil" class="com.robotrader.core.util.jaxb.JAXBUtilImpl"/>
+     
+     <!--JMS Configuration-->
+     <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+    </bean>
+     
+     <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <constructor-arg ref="jmsConnectionFactory" />            
+        <property name="sessionCacheSize" value="100" />
+    </bean>
+
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <constructor-arg ref="connectionFactory"/>
+    </bean>
+</beans>

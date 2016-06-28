@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Export-Package: com.robotrader.adapter;uses:="org.osgi.framework,com.r
+ obotrader.core.util,com.robotrader.core.util.sql,com.robotrader.core.
+ interval,com.robotrader.core.factor,org.springframework.jdbc.core,org
+ .springframework.context,com.robotrader.core.service,org.apache.log4j
+ ,com.robotrader.core.util.jaxb,org.springframework.jms.core"
+Built-By: 1
+Tool: Bnd-1.15.0
+Bundle-Name: RoboTrader::Adapter::Mock
+Created-By: Apache Maven Bundle Plugin
+Bundle-Version: 1.0.0.SNAPSHOT
+Build-Jdk: 1.7.0_01
+Bnd-LastModified: 1355247294825
+Bundle-ManifestVersion: 2
+Bundle-Activator: com.robotrader.adapter.adaptermock.Activator
+Import-Package: com.robotrader.adapter.adaptermock,com.robotrader.core
+ .factor;version="[1.0,2)",com.robotrader.core.interval;version="[1.0,
+ 2)",com.robotrader.core.service;version="[1.0,2)",com.robotrader.core
+ .util;version="[1.0,2)",com.robotrader.core.util.jaxb;version="[1.0,2
+ )",com.robotrader.core.util.sql;version="[1.0,2)",org.apache.log4j;ve
+ rsion="[1.2,2)",org.osgi.framework;version="[1.4,2)",org.springframew
+ ork.context;version="[3.0,4)",org.springframework.jdbc.core;version="
+ [3.0,4)",org.springframework.jms.core;version="[3.0,4)"
+Bundle-SymbolicName: com.robotrader.adapter.mock
+

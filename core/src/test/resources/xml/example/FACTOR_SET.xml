@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FACTOR_SET xmlns="http://com.robotrader/factor/" DATE="21/02/2013 22:00:22">
+    <ONLINE>
+        <ONLINE_FACTOR HEADER="ONLINE_FACTOR_CODE" DATE="21/02/2013 22:00:22" ACTIVE="1" VALUE="0"/>
+    </ONLINE>
+    <INTERVAL>
+        <INTERVAL_FACTOR HEADER="INTERVAL_FACTOR_CODE" DATE="21/02/2013 22:00:22" INTERVAL="1_H" OPEN="0" CLOSE="0" MIN="0" MAX="0"/>
+    </INTERVAL>
+</FACTOR_SET>
