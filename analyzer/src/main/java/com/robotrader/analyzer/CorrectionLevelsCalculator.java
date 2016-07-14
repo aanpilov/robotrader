@@ -122,8 +122,7 @@ public class CorrectionLevelsCalculator {
     }
     
     public static void main(String[] args) {
-//        calculate(119.95, 117.89, 119.2, 118.61);        
-//        calculate(125.55, 116.75, 122.37, 119.57);        
-        calculateTLevels(105.35, 110.59, 106, 125.55, 116.75);
+        calculate(131.04, 142, 137.07, 140.71);        
+//        calculateTLevels(130.51, 134.44, 131.04, 142, 135.75);
     }
 }
