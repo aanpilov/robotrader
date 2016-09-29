@@ -117,8 +117,10 @@ public class Stochastic implements Indicator {
             
             //В интервале 20-80
             if(lastValue.getTrendChanged()) {
+                return (lastValue.getTrendValue() == Advice.advUp)?Advice.advBuy: Advice.advSell;
+            } else {
                 return lastValue.getTrendValue();
-            }            
+            }
         }
         return Advice.advNothing;
     }
@@ -127,17 +129,23 @@ public class Stochastic implements Indicator {
         Double kValue = kAverageValues.get(date);
         Double dValue = dAverageValues.get(date);
         
-        Advice trendValue = Advice.map(kValue.compareTo(dValue));
-        
-        Advice lastTrendValue = trendValue;
+        Advice lastTrend = null;
         if(!trendValues.isEmpty()) {
             Date lastKey = trendValues.lastKey();
-            lastTrendValue = trendValues.getOrDefault(lastKey, trendValue);
+            lastTrend = trendValues.get(lastKey);
         }
         
-        trendValues.put(date, trendValue);
+        Advice trend;
+        int trendValue = kValue.compareTo(dValue);
+        if(trendValue == 0 && lastTrend != null) {
+            trend = lastTrend.not();
+        } else {
+            trend = (trendValue > 0)? Advice.advUp : Advice.advDown;
+        }
         
-        if(trendValue != lastTrendValue) {
+        trendValues.put(date, trend);
+        
+        if(lastTrend != null && trend != lastTrend) {
             trendChanges.put(date, Boolean.TRUE);
         } else {
             trendChanges.put(date, Boolean.FALSE);

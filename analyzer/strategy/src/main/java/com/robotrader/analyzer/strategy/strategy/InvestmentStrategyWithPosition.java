@@ -39,7 +39,15 @@ public class InvestmentStrategyWithPosition extends Thread {
                     message.append("Advice: ").append(Advice.advSell).append(" Paper: ").append(paper.getPaperTradeCode()).append(" Interval: ").append(Interval.ONE_DAY).append("\n");
                 }
             }
-        } else {
+        } else if(isSatisfied(Interval.ONE_MONTH, Advice.advBuy)) {
+            if(isSatisfied(Interval.ONE_WEEK, Advice.advBuy)) {
+                message.append("Advice: ").append(Advice.advBuy).append(" Paper: ").append(paper.getPaperTradeCode()).append(" Interval: ").append(Interval.ONE_WEEK).append("\n");
+                
+                if(isSatisfied(Interval.ONE_DAY, Advice.advBuy)) {
+                    message.append("Advice: ").append(Advice.advBuy).append(" Paper: ").append(paper.getPaperTradeCode()).append(" Interval: ").append(Interval.ONE_DAY).append("\n");
+                }
+            }
+        } else if(isSatisfied(Interval.ONE_MONTH, Advice.advUp)) {
             //Interval.ONE_MONTH - рост
             if(isSatisfied(Interval.ONE_WEEK, Advice.advSell)) {
                 message.append("Advice: ").append(Advice.advSell).append(" Paper: ").append(paper.getPaperTradeCode()).append(" Interval: ").append(Interval.ONE_WEEK).append("\n");

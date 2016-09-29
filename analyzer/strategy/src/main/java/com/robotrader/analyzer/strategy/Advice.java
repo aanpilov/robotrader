@@ -12,6 +12,8 @@ package com.robotrader.analyzer.strategy;
 public enum Advice {
     advBuy,
     advSell,
+    advUp,
+    advDown,
     advNothing,
     advAny;
     
@@ -30,6 +32,10 @@ public enum Advice {
             return advSell;
         } else if(this == advSell) {
             return advBuy;
+        } else if(this == advUp) {
+            return advDown;
+        } else if(this == advDown) {
+            return advUp;
         } else {
             return advNothing;
         }
