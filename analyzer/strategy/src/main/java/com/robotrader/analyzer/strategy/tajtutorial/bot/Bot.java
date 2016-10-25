@@ -33,7 +33,7 @@ public class Bot {
     public static void main(String[] args) throws Exception {
         TimeSeries finamSeries = FinamCsvTicksLoader.loadSeries(new File("src/test/resources/finam/SBER_H.csv"));
 
-        TimeSeries series = new TimeSeries("test", finamSeries.getTimePeriod());
+        TimeSeries series = new TimeSeries("test");
 
         Strategy strategy = ExampleStrategy.build(series);
         

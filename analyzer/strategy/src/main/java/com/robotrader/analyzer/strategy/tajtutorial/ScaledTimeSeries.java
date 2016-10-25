@@ -29,13 +29,13 @@ public class ScaledTimeSeries extends TimeSeries {
     private TimeSeries scaled;
     
     public ScaledTimeSeries(String name, TimeSeries timeSeries, Period period) {
-        super(name, period);
+        super(name);
         this.period = period;
         child = timeSeries;
     }
     
-    public final void rebuild() {
-        scaled = new TimeSeries(period);
+    public final void rebuild() {        
+        scaled = new TimeSeries();
         
         if(child.getTickCount() == 0) {
             return;
@@ -55,7 +55,7 @@ public class ScaledTimeSeries extends TimeSeries {
     }
     
     public final void rebuild(int index) {
-        scaled = new TimeSeries(period);
+        scaled = new TimeSeries();
         
         if(child.getTickCount() == 0) {
             return;
@@ -136,11 +136,6 @@ public class ScaledTimeSeries extends TimeSeries {
     }
 
     @Override
-    public Period getTimePeriod() {
-        return period;
-    }
-
-    @Override
     public String getSeriesPeriodDescription() {        
         return super.getSeriesPeriodDescription();
     }
@@ -187,7 +182,7 @@ public class ScaledTimeSeries extends TimeSeries {
         
         System.out.println("Series: " + dailySeries.getName() + " (" + dailySeries.getSeriesPeriodDescription() + ")");
         System.out.println("Number of ticks: " + dailySeries.getTickCount());
-        System.out.println("Time period: " + dailySeries.getTimePeriod());
+        System.out.println("Time period: " + dailySeries.getSeriesPeriodDescription());
         System.out.println("Last tick: \n"
                 + "\tVolume: " + dailySeries.getLastTick().getVolume() + "\n"
                 + "\tOpen price: " + dailySeries.getLastTick().getOpenPrice()+ "\n"

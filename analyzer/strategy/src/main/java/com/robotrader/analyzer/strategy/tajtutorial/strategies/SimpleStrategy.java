@@ -119,8 +119,8 @@ public class SimpleStrategy {
     }
     
     public static void main(String[] args) throws Exception {
-        TimeSeries finamSeries = FinamCsvTicksLoader.loadSeries(new File("src/test/resources/SBER_H.csv"));
-        TimeSeries series = new TimeSeries("test", finamSeries.getTimePeriod());
+        TimeSeries finamSeries = FinamCsvTicksLoader.loadSeries(new File("src/test/resources/finam/SBER_H.csv"));
+        TimeSeries series = new TimeSeries("test");
         
         SimpleStrategy strategy = new SimpleStrategy(series);
         TradingRecord longTradingRecord = new TradingRecord(Order.OrderType.BUY);

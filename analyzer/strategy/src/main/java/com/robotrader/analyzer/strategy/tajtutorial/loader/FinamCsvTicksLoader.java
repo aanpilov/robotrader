@@ -66,18 +66,17 @@ public class FinamCsvTicksLoader {
     }
     
     public static void main(String[] args) throws Exception {
-        TimeSeries series = FinamCsvTicksLoader.loadSeries(new File("src/test/resources/SBER_160919_161011_H.csv"));
+        TimeSeries series = FinamCsvTicksLoader.loadSeries(new File("src/test/resources/finam/SBER_H.csv"));
 
         System.out.println("Series: " + series.getName() + " (" + series.getSeriesPeriodDescription() + ")");
-        System.out.println("Number of ticks: " + series.getTickCount());
-        System.out.println("Time period: " + series.getTimePeriod());
+        System.out.println("Number of ticks: " + series.getTickCount());        
         System.out.println("First tick: \n"
                 + "\tVolume: " + series.getTick(0).getVolume() + "\n"
                 + "\tOpen price: " + series.getTick(0).getOpenPrice()+ "\n"
                 + "\tClose price: " + series.getTick(0).getClosePrice());
         
         List<TimeSeries> dailySeriesList = series.split(Period.days(1));
-        TimeSeries dailySeries = new TimeSeries("daily", Period.days(1));
+        TimeSeries dailySeries = new TimeSeries("daily");
         for(TimeSeries dailyLowSeries : dailySeriesList) {
             Decimal openPrice = dailyLowSeries.getFirstTick().getOpenPrice();
             Decimal closePrice = dailyLowSeries.getLastTick().getClosePrice();
@@ -91,7 +90,6 @@ public class FinamCsvTicksLoader {
         
         System.out.println("Series: " + dailySeries.getName() + " (" + dailySeries.getSeriesPeriodDescription() + ")");
         System.out.println("Number of ticks: " + dailySeries.getTickCount());
-        System.out.println("Time period: " + dailySeries.getTimePeriod());
         System.out.println("Last tick: \n"
                 + "\tVolume: " + dailySeries.getLastTick().getVolume() + "\n"
                 + "\tOpen price: " + dailySeries.getLastTick().getOpenPrice()+ "\n"
