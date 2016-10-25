@@ -12,8 +12,6 @@
   <packaging>pom</packaging>
   <name>RoboTrader::Adapter</name>
     <modules>
-    <module>adapter-alfadirect</module>
-    <module>adapter-tranzaq-connector</module>
     <module>moexiis</module>
   </modules>
 </project>

@@ -1,2 +1,5 @@
 /adapter/adapter-alfadirect/target/
 /adapter/adapter-tranzaq-connector/target/
+/analyzer/strategy/target/
+/core/target/
+/storage/target/
