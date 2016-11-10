@@ -5,10 +5,6 @@
  */
 package com.robotrader.adapter.core;
 
-import com.robotrader.adapter.core.jaxb.Candle;
-import com.robotrader.adapter.core.jaxb.Document;
-import java.util.List;
-import java.util.Map;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
@@ -23,8 +19,9 @@ public class MoexProxyFactory {
     public static MoexProxy getInstance() {
         if(instance == null) {
             ResteasyClient client = (ResteasyClient) ResteasyClientBuilder.newClient();
-            ResteasyWebTarget target = (ResteasyWebTarget) client.target("http://www.moex.com/iss/");
-            instance = target.proxy(MoexProxy.class);
+            
+            ResteasyWebTarget target = client.target("http://www.moex.com/iss/");
+            instance = MyProxyBuilder.builder(MoexProxy.class, target).build();
         }
         
         return instance;
