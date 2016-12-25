@@ -9,14 +9,15 @@ import com.robotrader.analyzer.strategy.Advice;
 import com.robotrader.core.factor.Paper;
 import com.robotrader.core.interval.Interval;
 import com.robotrader.core.service.AdapterService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author aav
  */
 public class InvestmentStrategyWithoutPosition extends Thread {
-    private Logger log = Logger.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
     
     private Paper paper;
     private AdapterService adapter;

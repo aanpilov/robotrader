@@ -12,7 +12,6 @@
   <packaging>pom</packaging>
   <name>RoboTrader::Analyzer</name>
   <modules>
-    <module>neuro</module>
     <module>strategy</module>
   </modules>
 </project>

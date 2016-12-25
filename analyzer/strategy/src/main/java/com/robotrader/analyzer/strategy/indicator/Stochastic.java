@@ -11,14 +11,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author anpilov_av
  */
 public class Stochastic implements Indicator {
-    private final Logger log = Logger.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
     
     protected final int kPeriod;
     private final int kSlowPeriod;

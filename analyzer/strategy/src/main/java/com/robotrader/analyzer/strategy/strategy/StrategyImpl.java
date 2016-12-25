@@ -11,14 +11,15 @@ import com.robotrader.core.factor.Bar;
 import com.robotrader.core.factor.BarStorage;
 import com.robotrader.core.service.AdapterService;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author aav
  */
 public class StrategyImpl extends Thread implements Strategy {
-    private Logger log = Logger.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
     
     private AdapterService adapterService;
     private BarStorage barStorage;

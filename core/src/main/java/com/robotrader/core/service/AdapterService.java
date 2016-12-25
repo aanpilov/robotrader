@@ -5,13 +5,8 @@
 package com.robotrader.core.service;
 
 import com.robotrader.core.factor.Bar;
-import com.robotrader.core.factor.FactorSetCollection;
 import com.robotrader.core.factor.Paper;
 import com.robotrader.core.interval.Interval;
-import com.robotrader.core.order.LimitOrder;
-import com.robotrader.core.order.Order;
-import com.robotrader.core.order.StopOrder;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+    xmlns:cxf="http://camel.apache.org/schema/blueprint/cxf"
+    xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd 
+                        http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
+                        http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.0.0.xsd
+                        http://camel.apache.org/schema/blueprint/cxf http://camel.apache.org/schema/blueprint/cxf/camel-cxf.xsd">
+
+    <cm:property-placeholder id="bproperties.placeholder" persistent-id="com.robotrader.analyzer.strategy" update-strategy="reload"/>
+
+    <bean id="amq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="brokerURL" value="vm://amq"/>
+        <property name="userName" value="admin"/>
+        <property name="password" value="admin"/>
+    </bean>
+    
+    <bean id="sberStrategy" class="com.robotrader.analyzer.strategy.strategy.SberStrategy" init-method="start" destroy-method="stop">
+        <property name="camelContext" ref="strategy-routes"/>
+    </bean>
+    
+    <reference id="adapterService" interface="com.robotrader.core.service.AsyncAdapterService"/>
+    
+    <bean id="trader" class="com.robotrader.analyzer.trader.Trader" init-method="start" destroy-method="stop">
+        <property name="camelContext" ref="strategy-routes"/>
+        <property name="adapterService" ref="adapterService"/>
+    </bean>
+    
+    <camelContext xmlns="http://camel.apache.org/schema/blueprint" id="strategy-routes">
+        <propertyPlaceholder location="blueprint:bproperties.placeholder"/>
+        
+        <packageScan>
+            <package>com.robotrader.analyzer.routes</package>
+        </packageScan>
+        
+<!--        <dataFormats>
+            <jaxb id="objectsJaxb" contextPath="com.robotrader.adapter.core.objects" prettyPrint="true" encoding="UTF-8"/>
+        </dataFormats>-->
+    </camelContext>
+</blueprint>

@@ -7,6 +7,7 @@ package com.robotrader.adapter.business;
 
 import com.robotrader.adapter.core.MoexProxy;
 import com.robotrader.adapter.core.MoexProxyFactory;
+import com.robotrader.adapter.core.MoexProxyHttpClient;
 import com.robotrader.adapter.core.ResponseParser;
 import com.robotrader.core.factor.Bar;
 import com.robotrader.core.factor.Paper;
@@ -28,7 +29,7 @@ import java.util.Set;
  */
 public class MoexAdapterServiceImpl extends AdapterServiceProxy {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private MoexProxy moexProxy = MoexProxyFactory.getInstance();
+    private MoexProxy moexProxy = new MoexProxyHttpClient();
     private ResponseParser parser = new ResponseParser();
 
     @Override
@@ -94,5 +95,6 @@ public class MoexAdapterServiceImpl extends AdapterServiceProxy {
     public static void main(String[] args) throws Exception {
         AdapterService adapterService = new MoexAdapterServiceImpl();
         System.out.println(adapterService.listPapers(null, null, null));
+        System.out.println(adapterService.getArchiveBars(new Paper(null, null, null, "SBER"), Interval.ONE_WEEK, 10));
     }
 }
