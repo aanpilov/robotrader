@@ -5,7 +5,7 @@
  */
 package ta4j;
 
-import com.robotrader.analyzer.Portfolio;
+import com.robotrader.analyzer.trader.Portfolio;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Order;
 import eu.verdelhan.ta4j.Tick;
@@ -48,6 +48,16 @@ public class StrategyManager {
         return orders;
     }
     
+    public Optional<Order> getLiquidationOrder() {
+        if(portfolio.getPosition().isPositive()) {
+            return Optional.of(Order.sellAt(series.getEnd(), series.getLastTick().getClosePrice(), portfolio.getPosition().abs()));
+        } else if(portfolio.getPosition().isNegative()) {
+            return Optional.of(Order.buyAt(series.getEnd(), series.getLastTick().getClosePrice(), portfolio.getPosition().abs()));
+        } else {
+            return Optional.empty();
+        }
+    }
+    
     private Optional<Order> processLastTick() {
         int endIndex = series.getEnd();
         
@@ -84,8 +94,9 @@ public class StrategyManager {
     }
     
     public static void main(String[] args) throws Exception {
-        Portfolio portfolio = new Portfolio(Decimal.valueOf(1000d), Decimal.valueOf(1000));
-        TimeSeries testTimeSeries = FinamCsvTicksLoader.loadSeries(new File("src/test/resources/finam/SBER_H.csv"));
+        Decimal initCapital = Decimal.valueOf(22000);
+        Portfolio portfolio = new Portfolio(initCapital.dividedBy(Decimal.valueOf(22)), Decimal.NaN);
+        TimeSeries testTimeSeries = FinamCsvTicksLoader.loadSeries(new File("src/test/resources/finam/SBER_H_2013.csv"));
         
 //        Strategy strategy = new SimpleStrategy();
         ReductionStrategy strategy = new ReductionStrategy();
@@ -97,8 +108,12 @@ public class StrategyManager {
         }
         
         List<Order> orders = strategyManager.getOrders();
+        if(strategyManager.getLiquidationOrder().isPresent()) {
+            orders.add(strategyManager.getLiquidationOrder().get());
+        }
         
         //Clear profit
         System.out.println("Clear profit: " + new ClearProfitCriterion().calculate(orders));
+        System.out.println("Clear profit %: " + (new ClearProfitCriterion().calculate(orders)/initCapital.toDouble()) * 100);
     }
 }

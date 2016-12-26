@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.robotrader.analyzer;
+package com.robotrader.analyzer.trader;
 
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Order;
@@ -37,6 +37,10 @@ public class Portfolio {
     
     public void setOrder(Tick tick, Decimal requiredPositionSign) {
         Decimal tickModule = tick.getMaxPrice().minus(tick.getMinPrice());
+        if(tickModule.isZero()) {
+            log.error("Tick module is ZERO: " + tick);
+            return;
+        }
         Decimal newPosition = calculateNewPosition(tickModule, requiredPositionSign);
         Decimal amount = newPosition.minus(position);
         
