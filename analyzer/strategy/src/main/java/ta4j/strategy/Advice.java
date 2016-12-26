@@ -16,5 +16,7 @@ public enum Advice {
     EXIT_LONG,
     EXIT_SHORT,
     REDUCE_LONG,
-    REDUCE_SHORT
+    REDUCE_SHORT,
+    TREND_UP,
+    TRENF_DOWN
 }

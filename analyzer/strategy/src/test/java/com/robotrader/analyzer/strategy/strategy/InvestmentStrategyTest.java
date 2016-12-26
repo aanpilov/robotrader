@@ -20,10 +20,10 @@ import org.springframework.context.ApplicationContext;
  *
  * @author aav
  */
-public class InvestmentStrategyWithoutPositionTest {
+public class InvestmentStrategyTest {
     private AdapterService adapterService;
     
-    public InvestmentStrategyWithoutPositionTest() {
+    public InvestmentStrategyTest() {
     }
     
     @BeforeClass
@@ -51,10 +51,9 @@ public class InvestmentStrategyWithoutPositionTest {
     public void testRun() {
         System.out.println("run");
         
-        Paper paper = new Paper("MICEX", "MICEX_SHR_T", "MCXT_SHR_LST", "VTGK");
-        
-        InvestmentStrategyWithoutPosition instance = new InvestmentStrategyWithoutPosition(paper, adapterService);
-        instance.run();
+        Paper paper = new Paper("MICEX", "MICEX_SHR_T", "MCXT_SHR_LST", "UKUZ");
+        InvestmentStrategyManager manager = new InvestmentStrategyManager(paper, adapterService, true);
+        manager.run();
     }
     
 }

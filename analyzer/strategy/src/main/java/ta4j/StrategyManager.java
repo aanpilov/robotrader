@@ -94,9 +94,9 @@ public class StrategyManager {
     }
     
     public static void main(String[] args) throws Exception {
-        Decimal initCapital = Decimal.valueOf(22000);
+        Decimal initCapital = Decimal.valueOf(2200);
         Portfolio portfolio = new Portfolio(initCapital.dividedBy(Decimal.valueOf(22)), Decimal.NaN);
-        TimeSeries testTimeSeries = FinamCsvTicksLoader.loadSeries(new File("src/test/resources/finam/SBER_H_2013.csv"));
+        TimeSeries testTimeSeries = FinamCsvTicksLoader.loadSeries(new File("src/test/resources/finam/BRENT_H_2016.csv"));
         
 //        Strategy strategy = new SimpleStrategy();
         ReductionStrategy strategy = new ReductionStrategy();

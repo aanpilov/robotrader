@@ -5,8 +5,6 @@
 package com.robotrader.analyzer.strategy.strategy;
 
 import com.robotrader.adapter.util.ModuleApplicationContext;
-import com.robotrader.analyzer.strategy.strategy.InvestmentStrategyWithPosition;
-import com.robotrader.analyzer.strategy.strategy.InvestmentStrategyWithoutPosition;
 import com.robotrader.core.factor.Paper;
 import com.robotrader.core.service.AdapterService;
 import java.util.HashSet;
@@ -104,13 +102,13 @@ public class StrategiesDispatcher {
         
         //Сначала свои
         for (Paper paper : MY_PAPERS) {
-            InvestmentStrategyWithPosition strategy = new InvestmentStrategyWithPosition(paper, adapterService);
-            executor.execute(strategy);
+            InvestmentStrategyManager manager = new InvestmentStrategyManager(paper, adapterService, true);
+            executor.execute(manager);
         }
 
         for (Paper paper : papers) {
-            InvestmentStrategyWithoutPosition strategy = new InvestmentStrategyWithoutPosition(paper, adapterService);
-            executor.execute(strategy);
+            InvestmentStrategyManager manager = new InvestmentStrategyManager(paper, adapterService, false);
+            executor.execute(manager);
         }
         executor.shutdown();
         while (!executor.isTerminated()) {
