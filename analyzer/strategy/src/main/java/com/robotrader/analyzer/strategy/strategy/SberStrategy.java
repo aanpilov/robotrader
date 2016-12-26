@@ -44,7 +44,7 @@ public class SberStrategy implements Processor {
         JAXBContext jaxbContext = JAXBContext.newInstance(Candle.class);
         unmarshaller = jaxbContext.createUnmarshaller();
         baseTimeSeries = new TimeSeries("SBER_H");
-        strategy = new SimpleStrategy();
+        strategy = new SimpleStrategy(baseTimeSeries);
     }
 
     public void setCamelContext(CamelContext camelContext) {

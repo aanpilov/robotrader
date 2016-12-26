@@ -7,6 +7,7 @@ package ta4j.strategy;
 
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Rule;
+import eu.verdelhan.ta4j.TimeSeries;
 import eu.verdelhan.ta4j.indicators.oscillators.StochasticOscillatorKIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
 import eu.verdelhan.ta4j.trading.rules.OverIndicatorRule;
@@ -19,6 +20,10 @@ import eu.verdelhan.ta4j.trading.rules.UnderIndicatorRule;
 public class ReductionStrategy extends SimpleStrategy {
     private Rule reduceLongRule;
     private Rule reduceShortRule;
+
+    public ReductionStrategy(TimeSeries timeSeries) {
+        super(timeSeries);
+    }
 
     @Override
     protected void initRules() {

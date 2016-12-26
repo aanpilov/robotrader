@@ -29,9 +29,9 @@ public class SimpleStrategy implements Strategy {
     private Rule enterShortRule;
     private Rule exitLongRule;    
     private Rule exitShortRule;    
-
-    public SimpleStrategy() {
-        this.timeSeries = new TimeSeries("child");
+    
+    public SimpleStrategy(TimeSeries timeSeries) {
+        this.timeSeries = timeSeries;
         parentTimeSeries = new ScaledTimeSeries("parent", timeSeries, Period.days(1));
         initRules();
     }

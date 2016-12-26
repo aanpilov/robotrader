@@ -5,6 +5,9 @@
  */
 package ta4j;
 
+import com.robotrader.analyzer.chart.ChartListener;
+import com.robotrader.analyzer.chart.ChartManager;
+import com.robotrader.analyzer.chart.FinamFileChartManager;
 import com.robotrader.analyzer.trader.Portfolio;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Order;
@@ -14,8 +17,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.joda.time.Period;
 import ta4j.analysis.criteria.ClearProfitCriterion;
-import ta4j.loader.FinamCsvTicksLoader;
 import ta4j.strategy.Advice;
 import ta4j.strategy.ReductionStrategy;
 import ta4j.strategy.SimpleStrategy;
@@ -25,22 +28,33 @@ import ta4j.strategy.Strategy;
  *
  * @author aanpilov
  */
-public class StrategyManager {    
+public class StrategyManager implements ChartListener {    
     private final TimeSeries series;
-    private final Strategy strategy;
     
+    private final Strategy strategy;    
     private final Portfolio portfolio;
+    private final ChartManager chartManager;
+    
     private final List<Order> orders = new ArrayList<>();
     
-    public StrategyManager(Strategy strategy, Portfolio portfolio) {
+    public StrategyManager(ChartManager chartManager, Strategy strategy, Portfolio portfolio) {
         this.portfolio = portfolio;        
         this.strategy = strategy;
         series = strategy.getTimeSeries();
+        this.chartManager = chartManager;        
+    }
+
+    public void start() {
+        chartManager.addChartListener(this);
+        chartManager.start();
     }
     
-    public void addTick(Tick tick) {
-        series.addTick(tick);
-        
+    @Override
+    public void archiveTickAdded(Tick tick) {        
+    }
+
+    @Override
+    public void onlineTickAdded(Tick tick) {
         processLastTick();
     }
 
@@ -95,18 +109,19 @@ public class StrategyManager {
     
     public static void main(String[] args) throws Exception {
         Decimal initCapital = Decimal.valueOf(2200);
+        
         Portfolio portfolio = new Portfolio(initCapital.dividedBy(Decimal.valueOf(22)), Decimal.NaN);
-        TimeSeries testTimeSeries = FinamCsvTicksLoader.loadSeries(new File("src/test/resources/finam/BRENT_H_2016.csv"));
+        ChartManager chartManager = new FinamFileChartManager(new File("src/test/resources/finam/SBER_H_2016.csv"), Period.hours(1));
         
-//        Strategy strategy = new SimpleStrategy();
-        ReductionStrategy strategy = new ReductionStrategy();
+//        Strategy strategy = new SimpleStrategy(chartManager.getChart());
+        ReductionStrategy strategy = new ReductionStrategy(chartManager.getChart());
         
-        StrategyManager strategyManager = new StrategyManager(strategy, portfolio);
+        StrategyManager strategyManager = new StrategyManager(chartManager, strategy, portfolio);
         
-        for (int i = 0; i < testTimeSeries.getTickCount(); i++) {            
-            strategyManager.addTick(testTimeSeries.getTick(i));
-        }
+        strategyManager.start();
         
+        Thread.sleep(15 * 1000);
+
         List<Order> orders = strategyManager.getOrders();
         if(strategyManager.getLiquidationOrder().isPresent()) {
             orders.add(strategyManager.getLiquidationOrder().get());
