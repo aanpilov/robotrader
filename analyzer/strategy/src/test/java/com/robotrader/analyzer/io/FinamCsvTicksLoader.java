@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ta4j.loader;
+package com.robotrader.analyzer.io;
 
 import au.com.bytecode.opencsv.CSVReader;
 import eu.verdelhan.ta4j.Decimal;

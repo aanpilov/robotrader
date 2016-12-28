@@ -7,6 +7,7 @@ package com.robotrader.core.service;
 
 import com.robotrader.core.objects.ConditionalOrder;
 import com.robotrader.core.objects.Security;
+import com.robotrader.core.objects.ServerStatus;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -28,7 +29,7 @@ public class JaxbContextImpl implements JaxbContext {
     
     public JaxbContextImpl() {
         try{
-            JAXBContext jaxbInstance = JAXBContext.newInstance("com.robotrader.core.objects");
+            JAXBContext jaxbInstance = JAXBContext.newInstance("com.robotrader.core.objects", ServerStatus.class.getClassLoader());
             marshaller = jaxbInstance.createMarshaller();
             unmarshaller = jaxbInstance.createUnmarshaller();
         } catch(Exception e){

@@ -6,7 +6,7 @@
 package com.robotrader.analyzer.strategy.strategy;
 
 import com.robotrader.adapter.util.ModuleApplicationContext;
-import com.robotrader.analyzer.strategy.tajtutorial.loader.CsvPapersLoader;
+import com.robotrader.analyzer.io.CsvPapersLoader;
 import com.robotrader.core.factor.Paper;
 import com.robotrader.core.service.AdapterService;
 import java.io.File;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.robotrader.analyzer.strategy.io;
+package com.robotrader.analyzer.io;
 
 import com.robotrader.core.factor.Bar;
 import com.robotrader.core.factor.Paper;

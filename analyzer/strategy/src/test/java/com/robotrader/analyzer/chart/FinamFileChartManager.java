@@ -5,11 +5,12 @@
  */
 package com.robotrader.analyzer.chart;
 
+import com.robotrader.analyzer.chart.AbstractChartManager;
 import eu.verdelhan.ta4j.Tick;
 import eu.verdelhan.ta4j.TimeSeries;
 import java.io.File;
 import org.joda.time.Period;
-import ta4j.loader.FinamCsvTicksLoader;
+import com.robotrader.analyzer.io.FinamCsvTicksLoader;
 
 /**
  *

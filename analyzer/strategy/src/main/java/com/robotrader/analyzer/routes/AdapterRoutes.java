@@ -21,7 +21,7 @@ public class AdapterRoutes extends RouteBuilder {
         .setBody(constant("NEW_DEAL"))
         .to("amq:SMS");
                 
-        from("amq:SMS").routeId("smsService")
+        from("amq:SMS").routeId("smsService").autoStartup(false)
         .setHeader(Exchange.HTTP_QUERY, simple("api_id=9BD6848C-7DEE-895A-D749-0692BCAF2C7F&to=79150037293&text=${body}"))
         .to("log:com.robotrader.analyzer?showAll=true&multiline=true")
         .to("http4://sms.ru/sms/send")

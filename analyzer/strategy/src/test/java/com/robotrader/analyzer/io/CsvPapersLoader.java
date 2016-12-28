@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.robotrader.analyzer.strategy.tajtutorial.loader;
+package com.robotrader.analyzer.io;
 
 import au.com.bytecode.opencsv.CSVReader;
 import com.robotrader.core.factor.Paper;
