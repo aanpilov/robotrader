@@ -79,6 +79,26 @@
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/com/robotrader/core/objects</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/java/com/robotrader/core/objects</directory>
+                                    <includes>
+                                        <include>jaxb.index</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>                    
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

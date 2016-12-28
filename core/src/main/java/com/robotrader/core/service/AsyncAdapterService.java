@@ -5,7 +5,8 @@
  */
 package com.robotrader.core.service;
 
-import com.robotrader.core.order.StopOrder;
+import com.robotrader.core.objects.ConditionalOrder;
+import com.robotrader.core.objects.Security;
 import org.joda.time.Period;
 
 /**
@@ -27,27 +28,25 @@ public interface AsyncAdapterService {
     
     /**
      * Получение исторических данных
-     * @param boardCode
-     * @param secCode
+     * @param security
      * @param period
      * @param count
      * @throws Exception 
      */
-    public void getHistory(String boardCode, String secCode, Period period, int count) throws Exception;
+    public void getHistory(Security security, Period period, int count) throws Exception;
     
     /**
      * Подпискана изменения
-     * @param boardCode
-     * @param secCode
+     * @param security     
      * @throws Exception 
      */
-    public void subscribe(String boardCode, String secCode) throws Exception;
+    public void subscribe(Security security) throws Exception;
     
     /**
-     * Выставление стоп-заявки
+     * Выставление условной заявки
      * @param order
      * @return
      * @throws Exception 
      */
-    public void createStopOrder(StopOrder order) throws Exception;
+    public void createConditionalOrder(ConditionalOrder order) throws Exception;
 }

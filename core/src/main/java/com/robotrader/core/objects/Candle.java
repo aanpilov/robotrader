@@ -9,7 +9,6 @@ import com.robotrader.adapter.core.objects.adapters.LocalDateTimeAdapter;
 import java.time.LocalDateTime;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -22,27 +21,30 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "candle")
 public class Candle {
+    private Security security;
+    
     @XmlJavaTypeAdapter(value = LocalDateTimeAdapter.class)
-    @XmlAttribute
     private LocalDateTime date;
     
-    @XmlAttribute
     private double open;
     
-    @XmlAttribute
     private double high;
     
-    @XmlAttribute
     private double low;
     
-    @XmlAttribute
     private double close;
     
-    @XmlAttribute
     private int volume;
     
-    @XmlAttribute
     private int oi;
+
+    public Security getSecurity() {
+        return security;
+    }
+
+    public void setSecurity(Security security) {
+        this.security = security;
+    }
     
     public LocalDateTime getDate() {
         return date;

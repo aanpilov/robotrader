@@ -6,8 +6,10 @@
 package com.robotrader.adapter.core;
 
 import java.net.URI;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -21,9 +23,14 @@ public class MoexProxyHttpClient implements MoexProxy {
     private static final String BASE_URI = "http://www.moex.com/iss/";
     private static final String SECURITIES_URI = BASE_URI + "engines/stock/markets/shares/boards/TQBR/securities.xml";
     private final HttpClient httpClient;
-
+    private final RequestConfig config;
+    
     public MoexProxyHttpClient() {
-        httpClient = HttpClientBuilder.create().build();
+        HttpHost proxy = new HttpHost("172.18.243.66", 3128, "http");
+        config = RequestConfig.custom()
+                    .setProxy(proxy)
+                    .build();
+        httpClient = HttpClientBuilder.create().build();        
     }
     
         
@@ -50,6 +57,7 @@ public class MoexProxyHttpClient implements MoexProxy {
     private String executeGetRequest(String url) {
         try {
             HttpGet getRequest = new HttpGet(url);
+            getRequest.setConfig(config);
             HttpResponse response = httpClient.execute(getRequest);
             if(response.getStatusLine().getStatusCode() != 200) {
                 throw new Exception(response.getStatusLine().getReasonPhrase());

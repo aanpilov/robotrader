@@ -9,7 +9,6 @@ import com.robotrader.adapter.core.objects.adapters.LocalDateTimeAdapter;
 import java.time.LocalDateTime;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -22,59 +21,37 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "trade")
 public class Trade {
-    /**
-     * Код торгового раздела
-     */
-    @XmlAttribute
-    private String board;
-    
-    /**
-     * Код инструмента
-     */
-    @XmlAttribute
-    private String secCode;
+    private Security security;
     
     /**
      * Дата сделки
      */
     @XmlJavaTypeAdapter(value = LocalDateTimeAdapter.class)
-    @XmlAttribute
     private LocalDateTime date;
     
     /**
      * Цена сделки
      */
-    @XmlAttribute
     private double price;
     
     /**
      * Объем сделки
      */
-    @XmlAttribute
     private int quantity;
     
     /**
      * Направление
      */
-    @XmlAttribute
     private String buySell;
 
-    public String getBoard() {
-        return board;
+    public Security getSecurity() {
+        return security;
     }
 
-    public void setBoard(String board) {
-        this.board = board;
+    public void setSecurity(Security security) {
+        this.security = security;
     }
-
-    public String getSecCode() {
-        return secCode;
-    }
-
-    public void setSecCode(String secCode) {
-        this.secCode = secCode;
-    }
-
+    
     public LocalDateTime getDate() {
         return date;
     }

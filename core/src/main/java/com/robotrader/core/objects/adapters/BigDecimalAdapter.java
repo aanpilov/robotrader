@@ -1,4 +1,4 @@
-package com.robotrader.core.util.jaxb.adapter;
+package com.robotrader.core.objects.adapters;
 
 import java.math.BigDecimal;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
