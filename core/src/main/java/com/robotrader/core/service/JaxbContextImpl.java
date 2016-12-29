@@ -49,14 +49,4 @@ public class JaxbContextImpl implements JaxbContext {
     public Object unmarshall(String str) throws JAXBException {
         return unmarshaller.unmarshal(new StringReader(str));
     }
-    
-    public static void main(String[] args) throws Exception {
-        JaxbContextImpl marshaller = new JaxbContextImpl();
-        
-        Security paper = new Security(null, null, "FUT", "SBER");
-        ConditionalOrder order = ConditionalOrder.buyLastUp(123, 0, paper, 5, BigDecimal.ONE, BigDecimal.TEN);
-        String str = marshaller.marshall(order);
-        System.out.println(str);
-        System.out.println(marshaller.unmarshall(str));
-    }
 }

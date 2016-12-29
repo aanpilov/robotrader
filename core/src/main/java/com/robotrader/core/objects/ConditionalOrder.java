@@ -5,7 +5,6 @@
  */
 package com.robotrader.core.objects;
 
-import java.math.BigDecimal;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -57,15 +56,15 @@ public class ConditionalOrder {
     
     private OrderStatus status;
     
-    private BigDecimal price;
+    private Double price;
     
     private long quantity;
     
     private Condition condition;
     
-    private BigDecimal conditionValue;
+    private Double conditionValue;
     
-    public static ConditionalOrder buyLastUp(long orderId, long marketOrderId, Security security, long quantity, BigDecimal price, BigDecimal lastUp) {
+    public static ConditionalOrder buyLastUp(long orderId, long marketOrderId, Security security, long quantity, Double price, Double lastUp) {
         ConditionalOrder order = new ConditionalOrder();
         
         order.setOrderId(orderId);
@@ -77,6 +76,22 @@ public class ConditionalOrder {
         order.setQuantity(quantity);
         order.setCondition(Condition.LAST_UP);
         order.setConditionValue(lastUp);
+        
+        return order;
+    }
+    
+    public static ConditionalOrder sellLastDown(long orderId, long marketOrderId, Security security, long quantity, Double price, Double lastDown) {
+        ConditionalOrder order = new ConditionalOrder();
+        
+        order.setOrderId(orderId);
+        order.setMarketOrderId(marketOrderId);
+        order.setSecurity(security);
+        order.setType(OrderType.BUY);
+        order.setStatus(OrderStatus.ACTIVE);
+        order.setPrice(price);
+        order.setQuantity(quantity);
+        order.setCondition(Condition.LAST_DOWN);
+        order.setConditionValue(lastDown);
         
         return order;
     }
@@ -121,11 +136,11 @@ public class ConditionalOrder {
         this.status = status;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -145,11 +160,19 @@ public class ConditionalOrder {
         this.condition = condition;
     }
 
-    public BigDecimal getConditionValue() {
+    public Double getConditionValue() {
         return conditionValue;
     }
 
-    public void setConditionValue(BigDecimal conditionValue) {
+    public void setConditionValue(Double conditionValue) {
         this.conditionValue = conditionValue;
+    }
+    
+    public boolean isBuy() {
+        return getType() == OrderType.BUY;
+    }
+    
+    public boolean isSell() {
+        return getType() == OrderType.SELL;
     }
 }
