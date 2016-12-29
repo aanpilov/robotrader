@@ -5,12 +5,12 @@
  */
 package com.robotrader.analyzer.chart;
 
-import com.robotrader.analyzer.chart.AbstractChartManager;
 import eu.verdelhan.ta4j.Tick;
 import eu.verdelhan.ta4j.TimeSeries;
 import java.io.File;
 import org.joda.time.Period;
 import com.robotrader.analyzer.io.FinamCsvTicksLoader;
+import com.robotrader.core.objects.Security;
 
 /**
  *
@@ -19,8 +19,8 @@ import com.robotrader.analyzer.io.FinamCsvTicksLoader;
 public class FinamFileChartManager extends AbstractChartManager {
     private final File file;
     
-    public FinamFileChartManager(File file, Period period) {
-        super(period);
+    public FinamFileChartManager(File file, Security security, Period period) {
+        super(security, period);
         this.file = file;
     }
     
