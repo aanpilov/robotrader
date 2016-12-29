@@ -49,4 +49,11 @@ public interface AsyncAdapterService {
      * @throws Exception 
      */
     public void createConditionalOrder(ConditionalOrder order) throws Exception;
+    
+    /**
+     * Удаление заявки
+     * @param orderId
+     * @throws Exception 
+     */
+    public void removeOrder(long orderId) throws Exception;
 }

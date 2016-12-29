@@ -6,36 +6,54 @@
 package com.robotrader.mock;
 
 import com.robotrader.analyzer.io.FinamCsvTicksLoader;
-import com.robotrader.analyzer.strategy.StrategyManager;
-import com.robotrader.analyzer.trader.Portfolio;
-import com.robotrader.analyzer.trader.StrategyTrader;
+import com.robotrader.analyzer.portfolio.Portfolio;
 import com.robotrader.core.objects.ConditionalOrder;
 import com.robotrader.core.objects.Security;
 import com.robotrader.core.service.AsyncAdapterService;
 import eu.verdelhan.ta4j.Decimal;
+import eu.verdelhan.ta4j.Order;
 import eu.verdelhan.ta4j.Tick;
 import eu.verdelhan.ta4j.TimeSeries;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ta4j.strategy.ReductionStrategy;
 
 /**
  *
  * @author aanpilov
  */
 public class FinamFileAdapter implements AsyncAdapterService {
-    private final Set<ConditionalOrder> orders = new HashSet<>();
-    private final Set<ChartManager> chartManagers = new HashSet<>();
+    private final Map<Long, ConditionalOrder> orders = new HashMap<>();
+    private final Set<MockChartManager> chartManagers = new HashSet<>();
+    private Portfolio portfolio;
+    private long position = 0;
     
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final File file;
+    private final List<Order> deals = new ArrayList<>();
 
     public FinamFileAdapter(File file) {
         this.file = file;
+    }
+
+    public List<Order> getDeals() {
+        return deals;
+    }
+    
+    public void mockProcessTicks() throws Exception {
+        TimeSeries series = FinamCsvTicksLoader.loadSeries(file);
+        for (int i = 0; i < series.getEnd(); i++) {
+            Tick tick = series.getTick(i);            
+            matchOrders(tick);
+            chartManagers.forEach(manager -> manager.addOnlineTick(tick));
+        }
     }
     
     @Override
@@ -55,57 +73,83 @@ public class FinamFileAdapter implements AsyncAdapterService {
 
     @Override
     public void subscribe(Security security) throws Exception {
-        TimeSeries series = FinamCsvTicksLoader.loadSeries(file);
-        for (int i = 0; i < series.getEnd(); i++) {
-            Tick tick = series.getTick(i);
-            matchOrders(tick);
-            chartManagers.forEach(manager -> manager.addOnlineTick(tick));
+        log.info("Subscribed to: " + security);
+    }
+
+    public synchronized void deleteConditionalOrder(ConditionalOrder order) {        
+        log.info("Remove order: " + order);
+        orders.remove(order.getOrderId());
+        updatePortfolioOrders();
+    }
+
+    @Override
+    public synchronized void createConditionalOrder(ConditionalOrder order) throws Exception {        
+        long newOrderId = System.nanoTime();
+        order.setOrderId(newOrderId);
+        orders.put(order.getOrderId(), order);
+        log.info("Add order: " + order);
+        
+        updatePortfolioOrders();
+    }
+    
+    public void addChartManager(MockChartManager chartManager) {
+        chartManagers.add(chartManager);
+    }
+
+    public void setPortfolio(Portfolio portfolio) {
+        this.portfolio = portfolio;
+    }
+
+    private synchronized void matchOrders(Tick tick) {
+        List<Long> matchedIdentifiers = new ArrayList();
+        for (ConditionalOrder order : orders.values()) {
+            if(tick.getMinPrice().toDouble() <= order.getConditionValue()
+               && order.getConditionValue() <= tick.getMaxPrice().toDouble()) {
+                matchedIdentifiers.add(order.getOrderId());
+            }
+        }
+        
+        for (Long matchedIdentifier : matchedIdentifiers) {
+            ConditionalOrder order = orders.get(matchedIdentifier);
+            matchOrder(order);
+        }
+        
+        for (Long matchedIdentifier : matchedIdentifiers) {
+            orders.remove(matchedIdentifier);
         }
     }
 
     @Override
-    public void createConditionalOrder(ConditionalOrder order) throws Exception {
-        orders.add(order);
+    public synchronized void removeOrder(long orderId) throws Exception {
+        log.info("Remove order: " + orderId);
+        orders.get(orderId).setStatus(ConditionalOrder.OrderStatus.CANCELLED);
+        updatePortfolioOrders();
+        orders.remove(orderId);
     }
     
-    public void addChartManager(ChartManager chartManager) {
-        chartManagers.add(chartManager);
-    }
-
-    private void matchOrders(Tick tick) {
-        for (ConditionalOrder order : orders) {
-            if(tick.getMinPrice().toDouble() <= order.getConditionValue().doubleValue()
-               && order.getConditionValue().doubleValue() <= tick.getMaxPrice().toDouble()) {
-                matchOrder(order);
-                orders.remove(order);
-            }
-        }
-    }
-
     private void matchOrder(ConditionalOrder order) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        order.setStatus(ConditionalOrder.OrderStatus.MATCHED);
+        Order deal = null;
+        if(order.isBuy()) {
+            position += order.getQuantity();
+            deal = Order.buyAt(0, Decimal.valueOf(order.getPrice()), Decimal.valueOf(order.getQuantity()));
+        } else {
+            position -= order.getQuantity();
+            deal = Order.sellAt(0, Decimal.valueOf(order.getPrice()), Decimal.valueOf(order.getQuantity()));
+        }
+        
+        deals.add(deal);
+        log.info("New Deal: " + deal);
+        
+        updatePortfolioPositions();
+        updatePortfolioOrders();
+    }
+
+    private synchronized void updatePortfolioOrders() {
+        portfolio.importOrders(orders.values());
     }
     
-    public static void main(String[] args) throws Exception {
-        //Init objects
-        Security security = new Security(null, null, null, "SBER");
-        FinamFileAdapter adapter = new FinamFileAdapter(new File("src/test/resources/finam/SBER_H_2016.csv"));
-        
-        ChartManager chartManager = new ChartManager(security, Period.hours(1));
-        adapter.addChartManager(chartManager);
-        
-        Decimal initCapital = Decimal.valueOf(22000);        
-        Portfolio portfolio = new Portfolio();
-        
-        ReductionStrategy strategy = new ReductionStrategy(chartManager.getChart());
-        StrategyManager strategyManager = new StrategyManager(chartManager, strategy);
-        StrategyTrader strategyTrader = new StrategyTrader(portfolio, chartManager, strategyManager, adapter, initCapital.dividedBy(Decimal.valueOf(22)), Decimal.NaN);
-        
-        //Start
-        strategyTrader.start();
-        
-        //Result
-        System.out.println("Tick count: " + chartManager.getChart().getTickCount());        
+    private void updatePortfolioPositions() {
+        portfolio.importPositions(position);
     }
-    
 }

@@ -11,32 +11,29 @@ import com.robotrader.analyzer.chart.ChartManager;
 import eu.verdelhan.ta4j.Tick;
 import java.util.HashSet;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ta4j.strategy.Strategy;
 
 /**
  *
  * @author aanpilov
  */
-public class StrategyManager implements ChartListener {    
-    private final Strategy strategy;
-    private final ChartManager chartManager;    
+public class StrategyManager implements ChartListener {
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Strategy strategy;    
     
     private final Set<StrategyListener> strategyListeners = new HashSet<>();
     
     public StrategyManager(ChartManager chartManager, Strategy strategy) {
         this.strategy = strategy;        
-        this.chartManager = chartManager;        
+        chartManager.addChartListener(this);
     }
     
     public void addStrategyListener(StrategyListener strategyListener) {
         strategyListeners.add(strategyListener);
     }
 
-    public void start() {
-        chartManager.addChartListener(this);
-        chartManager.start();
-    }
-    
     @Override
     public void archiveTickAdded(Tick tick) {        
     }

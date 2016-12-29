@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author aanpilov
  */
-public class ChartManager extends AbstractChartManager {
+public class MockChartManager extends AbstractChartManager {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    public ChartManager(Security security, Period period) {
+    public MockChartManager(Security security, Period period) {
         super(security, period);
     }
 

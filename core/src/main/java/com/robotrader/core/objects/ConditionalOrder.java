@@ -86,7 +86,7 @@ public class ConditionalOrder {
         order.setOrderId(orderId);
         order.setMarketOrderId(marketOrderId);
         order.setSecurity(security);
-        order.setType(OrderType.BUY);
+        order.setType(OrderType.SELL);
         order.setStatus(OrderStatus.ACTIVE);
         order.setPrice(price);
         order.setQuantity(quantity);
@@ -174,5 +174,10 @@ public class ConditionalOrder {
     
     public boolean isSell() {
         return getType() == OrderType.SELL;
+    }
+
+    @Override
+    public String toString() {
+        return "ConditionalOrder{" + "orderId=" + orderId + ", type=" + type + ", price=" + price + ", quantity=" + quantity + ", condition=" + condition + ", conditionValue=" + conditionValue + '}';
     }
 }
