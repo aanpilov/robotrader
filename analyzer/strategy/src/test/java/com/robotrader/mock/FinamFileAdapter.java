@@ -34,6 +34,7 @@ public class FinamFileAdapter implements AsyncAdapterService {
     private final Set<MockChartManager> chartManagers = new HashSet<>();
     private Portfolio portfolio;
     private long position = 0;
+    private int dealCounter = 0;
     
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final File file;
@@ -49,8 +50,9 @@ public class FinamFileAdapter implements AsyncAdapterService {
     
     public void mockProcessTicks() throws Exception {
         TimeSeries series = FinamCsvTicksLoader.loadSeries(file);
-        for (int i = 0; i < series.getEnd(); i++) {
-            Tick tick = series.getTick(i);            
+        for (int i = 0; i <= series.getEnd(); i++) {
+            Tick tick = series.getTick(i);          
+            log.info("New tick: " + tick);
             matchOrders(tick);
             chartManagers.forEach(manager -> manager.addOnlineTick(tick));
         }
@@ -132,10 +134,10 @@ public class FinamFileAdapter implements AsyncAdapterService {
         Order deal = null;
         if(order.isBuy()) {
             position += order.getQuantity();
-            deal = Order.buyAt(0, Decimal.valueOf(order.getPrice()), Decimal.valueOf(order.getQuantity()));
+            deal = Order.buyAt(dealCounter++, Decimal.valueOf(order.getPrice()), Decimal.valueOf(order.getQuantity()));
         } else {
             position -= order.getQuantity();
-            deal = Order.sellAt(0, Decimal.valueOf(order.getPrice()), Decimal.valueOf(order.getQuantity()));
+            deal = Order.sellAt(dealCounter++, Decimal.valueOf(order.getPrice()), Decimal.valueOf(order.getQuantity()));
         }
         
         deals.add(deal);
