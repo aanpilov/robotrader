@@ -9,12 +9,19 @@ import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Rule;
 import eu.verdelhan.ta4j.TimeSeries;
 import eu.verdelhan.ta4j.indicators.oscillators.StochasticOscillatorKIndicator;
+import eu.verdelhan.ta4j.indicators.simple.ClosePriceIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.EMAIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.bollinger.BollingerBandWidthIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.bollinger.BollingerBandsLowerIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.bollinger.BollingerBandsMiddleIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.bollinger.BollingerBandsUpperIndicator;
 import eu.verdelhan.ta4j.trading.rules.InPipeRule;
 import eu.verdelhan.ta4j.trading.rules.OverIndicatorRule;
 import eu.verdelhan.ta4j.trading.rules.UnderIndicatorRule;
 import org.joda.time.Period;
 import ta4j.ScaledTimeSeries;
+import ta4j.indicators.statistics.StandardDeviationIndicator;
 import ta4j.rule.ScaledRule;
 
 /**
@@ -37,7 +44,7 @@ public class SimpleStrategy implements Strategy {
     }
 
     protected void initRules() {
-        unstablePeriod = 63;
+        unstablePeriod = 72;
         
         StochasticOscillatorKIndicator parentStochIndicator = new StochasticOscillatorKIndicator(parentTimeSeries, 5);        
         SMAIndicator parentKIndicator = new SMAIndicator(parentStochIndicator, 3);
@@ -57,13 +64,24 @@ public class SimpleStrategy implements Strategy {
         SMAIndicator kIndicator = new SMAIndicator(stochIndicator, 5);
         SMAIndicator dIndicator = new SMAIndicator(kIndicator, 3);
         
+        ClosePriceIndicator closePriceIndicator = new ClosePriceIndicator(timeSeries);        
+        EMAIndicator emaIndicator = new EMAIndicator(closePriceIndicator, 13);
+        StandardDeviationIndicator standardDeviationIndicator = new StandardDeviationIndicator(emaIndicator, closePriceIndicator, 13);
+        
+        BollingerBandsMiddleIndicator bbm = new BollingerBandsMiddleIndicator(emaIndicator);
+        BollingerBandsLowerIndicator bbl = new BollingerBandsLowerIndicator(bbm, standardDeviationIndicator);
+        BollingerBandsUpperIndicator bbu = new BollingerBandsUpperIndicator(bbm, standardDeviationIndicator);
+        BollingerBandWidthIndicator widthIndicator = new BollingerBandWidthIndicator(bbu, bbm, bbl);
+        
         enterLongRule = parentLongEnterRuleWrapper.and(new OverIndicatorRule(kIndicator, dIndicator)
-                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))));
+                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))))
+                        .and(new OverIndicatorRule(widthIndicator, Decimal.valueOf(1)));
         
         exitLongRule = new UnderIndicatorRule(kIndicator, dIndicator).and(new UnderIndicatorRule(kIndicator, Decimal.valueOf(80)));
         
         enterShortRule = parentShortEnterRuleWrapper.and(new UnderIndicatorRule(kIndicator, dIndicator)
-                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))));
+                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))))
+                        .and(new OverIndicatorRule(widthIndicator, Decimal.valueOf(1)));
         
         exitShortRule = new OverIndicatorRule(kIndicator, dIndicator).and(new OverIndicatorRule(kIndicator, Decimal.valueOf(20)));
     }
