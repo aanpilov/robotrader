@@ -54,7 +54,7 @@ public class StrategyTrader implements StrategyListener, PortfolioListener {
         Tick tradeTick = chartManager.getTickStartedAt(tick.getBeginTime()).get();
 
         try {
-            if(portfolio.getPosition().isZero() && (advice == Advice.EXIT_LONG || advice == Advice.EXIT_SHORT || advice == Advice.NOTHING)) {
+            if(portfolio.getPosition().isZero()) {
                 removeActiveOrders();
             }
             
