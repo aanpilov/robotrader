@@ -54,6 +54,10 @@ public class StrategyTrader implements StrategyListener, PortfolioListener {
         Tick tradeTick = chartManager.getTickStartedAt(tick.getBeginTime()).get();
 
         try {
+            if(portfolio.getPosition().isZero() && (advice == Advice.EXIT_LONG || advice == Advice.EXIT_SHORT || advice == Advice.NOTHING)) {
+                removeActiveOrders();
+            }
+            
             if (portfolio.getPosition().isPositive() && advice == Advice.EXIT_LONG) {
                 closePosition(tradeTick);
             }
@@ -142,9 +146,13 @@ public class StrategyTrader implements StrategyListener, PortfolioListener {
     private ConditionalOrder createStopOrder(Decimal amount) {
         ConditionalOrder order;
         if(amount.isPositive()) {
-            order = ConditionalOrder.sellLastDown(0, 0, chartManager.getSecurity(), new Double(amount.abs().toDouble()).longValue(), positionTick.getMinPrice().toDouble(), positionTick.getMinPrice().toDouble());
+            Decimal stopLevel = positionTick.getMaxPrice().minus(positionTick.getMaxPrice().multipliedBy(riskThreshold));
+            if(stopLevel.isLessThanOrEqual(positionTick.getMinPrice()))stopLevel = positionTick.getMinPrice();
+            order = ConditionalOrder.sellLastDown(0, 0, chartManager.getSecurity(), new Double(amount.abs().toDouble()).longValue(), stopLevel.toDouble(), stopLevel.toDouble());
         } else {
-            order = ConditionalOrder.buyLastUp(0, 0, chartManager.getSecurity(), new Double(amount.abs().toDouble()).longValue(), positionTick.getMaxPrice().toDouble(), positionTick.getMaxPrice().toDouble());
+            Decimal stopLevel = positionTick.getMinPrice().plus(positionTick.getMinPrice().multipliedBy(riskThreshold));
+            if(stopLevel.isGreaterThanOrEqual(positionTick.getMaxPrice()))stopLevel = positionTick.getMaxPrice();
+            order = ConditionalOrder.buyLastUp(0, 0, chartManager.getSecurity(), new Double(amount.abs().toDouble()).longValue(), stopLevel.toDouble(), stopLevel.toDouble());
         }
         
         log.info("Stop order: " + order);
@@ -165,11 +173,7 @@ public class StrategyTrader implements StrategyListener, PortfolioListener {
         if(tickModule.isZero()) {
             throw new Exception("TickModule is zero: " + tick);
         }
-        Decimal newPosition = riskThreshold.dividedBy(tickModule);
-        if(newPosition.isGreaterThan(positionThreshold)) {
-            newPosition = positionThreshold;
-        }
-        
+        Decimal newPosition = positionThreshold;        
         return Decimal.valueOf(Math.rint(newPosition.multipliedBy(requiredPositionSign).toDouble()));
     }
     
