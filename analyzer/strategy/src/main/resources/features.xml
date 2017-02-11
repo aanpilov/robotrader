@@ -7,7 +7,7 @@
         <bundle>mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>       
         <bundle>mvn:com.robotrader/core/${project.version}</bundle>       
         <bundle>wrap:mvn:eu.verdelhan/ta4j/0.9-SNAPSHOT</bundle>       
-        <bundle>mvn:joda-time/joda-time/2.3</bundle>       
+        <bundle>mvn:joda-time/joda-time/2.5</bundle>       
     </feature>
 
 </features>

@@ -17,10 +17,6 @@
         <property name="password" value="admin"/>
     </bean>
     
-    <bean id="sberStrategy" class="com.robotrader.analyzer.strategy.strategy.SberStrategy" init-method="start" destroy-method="stop">
-        <property name="camelContext" ref="strategy-routes"/>
-    </bean>
-    
     <reference id="adapterService" interface="com.robotrader.core.service.AsyncAdapterService"/>
     <reference id="jaxbContext" interface="com.robotrader.core.service.JaxbContext"/>
     

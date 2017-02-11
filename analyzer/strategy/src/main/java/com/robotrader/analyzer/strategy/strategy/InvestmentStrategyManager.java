@@ -70,9 +70,7 @@ public class InvestmentStrategyManager extends Thread {
                     if(advice == Advice.EXIT_LONG) {
                         message.append(getAdviceMessage(advice, paper, Interval.ONE_DAY));
                     }
-                }
-
-                if(advice == Advice.ENTER_LONG) {
+                } else if(advice == Advice.ENTER_LONG) {
                     message.append(getAdviceMessage(advice, paper, Interval.ONE_WEEK));
 
                     advice = getAdvice(Interval.ONE_DAY);

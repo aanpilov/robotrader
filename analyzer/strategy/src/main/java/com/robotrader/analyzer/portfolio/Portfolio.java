@@ -24,6 +24,7 @@ public class Portfolio {
     private final Logger log = LoggerFactory.getLogger(getClass());
     
     private Decimal position = Decimal.ZERO;    
+    private boolean positionInitialized = false;
     private final Map<Long, ConditionalOrder> activeOrders = new HashMap<>();
     private final Set<PortfolioListener> listeners = new HashSet<>();
     
@@ -58,7 +59,11 @@ public class Portfolio {
             log.info("Position changed: " + newPosition);
             
             position = Decimal.valueOf(newPosition);
-            listeners.forEach(listener -> listener.positionChanged(position));
+            if(positionInitialized) {
+                listeners.forEach(listener -> listener.positionChanged(position));
+            } else {
+                positionInitialized = true;
+            }
         }
     }
 }

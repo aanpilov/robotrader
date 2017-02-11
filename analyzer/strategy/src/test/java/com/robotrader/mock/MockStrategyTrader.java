@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.robotrader.analyzer.trader;
+package com.robotrader.mock;
 
+import com.robotrader.analyzer.trader.AbstractStrategyTrader;
+import com.robotrader.analyzer.portfolio.Portfolio;
 import com.robotrader.analyzer.chart.ChartManager;
 import com.robotrader.analyzer.portfolio.PortfolioManager;
 import com.robotrader.analyzer.strategy.StrategyManager;
@@ -19,24 +21,24 @@ import java.util.Set;
 
 /**
  *
- * @author aanpilov
+ * @author aav
  */
-public class StrategyTrader extends AbstractStrategyTrader {
+public class MockStrategyTrader extends AbstractStrategyTrader {
     private final AsyncAdapterService adapterService;
     
     private final Decimal riskThreshold;
     private final Decimal positionThreshold;
-    private final Decimal conditionSkip = Decimal.ONE;
-    private final Decimal priceSkip = Decimal.THREE;
+    private final Decimal conditionSkip = Decimal.ZERO;
+    private final Decimal priceSkip = Decimal.ZERO;
     private Decimal stopLevel = Decimal.NaN;
     
-    public StrategyTrader(PortfolioManager portfolioManager, ChartManager chartManager, StrategyManager strategyManager, AsyncAdapterService adapterService, Decimal riskThreshold, Decimal positionThreshold) {
+    public MockStrategyTrader(PortfolioManager portfolioManager, ChartManager chartManager, StrategyManager strategyManager, AsyncAdapterService adapterService, Decimal riskThreshold, Decimal positionThreshold) {
         super(portfolioManager.getSecurityPortfolio(chartManager.getSecurity()), chartManager, strategyManager);
         this.adapterService = adapterService;
         this.riskThreshold = riskThreshold;
         this.positionThreshold = positionThreshold;
     }
-    
+
     @Override
     protected void closePosition(Tick tick) throws Exception {
         removeActiveOrders();
@@ -47,7 +49,7 @@ public class StrategyTrader extends AbstractStrategyTrader {
         ConditionalOrder order = createOrder(amount, price);
         tradeOrder(order);
     }
-    
+
     @Override
     protected void openPosition(Tick tick, Decimal requiredPositionSign) throws Exception {
         removeActiveOrders();
@@ -61,7 +63,7 @@ public class StrategyTrader extends AbstractStrategyTrader {
         
         stopLevel = calculateStopPrice(tick, amount, price);
     }
-    
+
     @Override
     protected void reducePosition(Tick tick) throws Exception {
         removeActiveOrders();
@@ -77,12 +79,12 @@ public class StrategyTrader extends AbstractStrategyTrader {
         ConditionalOrder reductionOrder = createOrder(amount, price);
         
         log.info("Reduction order: " + reductionOrder);
-//        adapterService.createConditionalOrder(reductionOrder);
-//        
-//        ConditionalOrder stopOrder = createStopOrder(Decimal.ZERO.minus(newPosition));
-//        adapterService.createConditionalOrder(stopOrder);
+        adapterService.createConditionalOrder(reductionOrder);
+        
+        ConditionalOrder stopOrder = createStopOrder(Decimal.ZERO.minus(newPosition));
+        adapterService.createConditionalOrder(stopOrder);
     }
-    
+
     @Override
     protected void removeActiveOrders() throws Exception {
         Set<Long> activeOrders = new HashSet<>();
@@ -101,12 +103,12 @@ public class StrategyTrader extends AbstractStrategyTrader {
         } else {
             final double condition = level.minus(conditionSkip).toDouble();
             final double price = level.minus(priceSkip).toDouble();
-            
+        
             return ConditionalOrder.sellLastDown(0, 0, chartManager.getSecurity(), new Double(amount.abs().toDouble()).longValue(), price, condition);
         }
     }
     
-    private ConditionalOrder createStopOrder(Decimal amount) {
+    private ConditionalOrder createStopOrder(Decimal amount) {        
         if(stopLevel == null || stopLevel.isNaN()) {
             throw new RuntimeException("StopLevel not setted!!!");
         }

@@ -14,16 +14,19 @@ import java.util.Optional;
 import java.util.Set;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author aanpilov
  */
 public abstract class AbstractChartManager extends Thread implements ChartManager {
+    private final Logger log = LoggerFactory.getLogger(getClass());
     protected final Set<ChartListener> listeners = new HashSet<>();
     protected final TimeSeries series;
     protected final Period period;
-    private final Security security;
+    protected final Security security;
 
     public AbstractChartManager(Security security, Period period) {
         this.series = new TimeSeries();
@@ -53,6 +56,9 @@ public abstract class AbstractChartManager extends Thread implements ChartManage
 
     @Override
     public Optional<Tick> getTickStartedAt(DateTime time) {
+        if(series.getTickCount() == 0) {
+             return Optional.empty();
+        }
         if(series.getLastTick().getBeginTime().isEqual(time)) {
             return Optional.of(series.getLastTick());
         } else if(series.getLastTick().getBeginTime().isAfter(time)){
@@ -81,21 +87,50 @@ public abstract class AbstractChartManager extends Thread implements ChartManage
     }
     
     protected void addArchiveTick(Tick tick) {
+        if(tick.getBeginTime().getHourOfDay() <= 10){
+            log.warn("Invalid Tick begin date: " + tick.getBeginTime());
+            return;
+        }
+        
+        log.info("Add archive tick of " + security.getSecurityCode() + ": " + tick);        
         series.addTick(tick);
         
-        listeners.forEach((listener) -> {listener.archiveTickAdded(tick);});
+        if(!tick.inPeriod(DateTime.now())) {
+            listeners.forEach((listener) -> {listener.archiveTickAdded(tick);});
+        }        
     }
     
     protected void addTrade(DateTime timestamp, Decimal tradeAmount, Decimal tradePrice) {
+        DateTime startTime = timestamp.minus(timestamp.getMillis() % period.toStandardDuration().getMillis());
+        
+        if(startTime.getHourOfDay() < 10) {
+            log.warn("Invalid trade date: " + timestamp);
+            return;
+        }
+        
+        if(series.getTickCount() == 0) {
+            newTickFromTrade(timestamp, tradeAmount, tradePrice);
+            return;
+        }
+        
         if(series.getLastTick().inPeriod(timestamp)) {
             series.getLastTick().addTrade(tradeAmount, tradePrice);
         } else {
-            listeners.forEach((listener) -> {listener.onlineTickAdded(series.getLastTick());});
+            if(series.getTickCount() > 1 && series.getLastTick().getEndTime().isEqual(startTime)) {
+                //Exclude single aggregated
+                log.info("Add online tick of " + security.getSecurityCode() + ": " + series.getLastTick());
+                listeners.forEach((listener) -> {listener.onlineTickAdded(series.getLastTick());});
+            }
             
-            DateTime endTime = timestamp.minus(timestamp.getMillis() % period.toStandardDuration().getMillis()).plus(period);
-            Tick newTick = new Tick(period, endTime);
-            newTick.addTrade(tradeAmount, tradePrice);
-            series.addTick(newTick);
+            newTickFromTrade(timestamp, tradeAmount, tradePrice);
         }
+    }
+
+    private void newTickFromTrade(DateTime timestamp, Decimal tradeAmount, Decimal tradePrice) {
+        DateTime endTime = timestamp.minus(timestamp.getMillis() % period.toStandardDuration().getMillis()).plus(period);
+        
+        Tick newTick = new Tick(period, endTime);
+        newTick.addTrade(tradeAmount, tradePrice);
+        series.addTick(newTick);
     }
 }

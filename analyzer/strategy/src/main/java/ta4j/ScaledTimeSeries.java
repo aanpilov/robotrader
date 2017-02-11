@@ -11,6 +11,8 @@ import eu.verdelhan.ta4j.Strategy;
 import eu.verdelhan.ta4j.Tick;
 import eu.verdelhan.ta4j.TimeSeries;
 import eu.verdelhan.ta4j.TradingRecord;
+import eu.verdelhan.ta4j.indicators.helpers.HighestValueIndicator;
+import eu.verdelhan.ta4j.indicators.helpers.LowestValueIndicator;
 import eu.verdelhan.ta4j.indicators.simple.MaxPriceIndicator;
 import eu.verdelhan.ta4j.indicators.simple.MinPriceIndicator;
 import eu.verdelhan.ta4j.indicators.simple.VolumeIndicator;
@@ -33,23 +35,7 @@ public class ScaledTimeSeries extends TimeSeries {
     }
     
     public final void rebuild() {        
-        scaled = new TimeSeries();
-        
-        if(child.getTickCount() == 0) {
-            return;
-        }
-        
-        List<TimeSeries> split = child.split(period);
-        for (TimeSeries timeSeries : split) {
-            Decimal openPrice = timeSeries.getFirstTick().getOpenPrice();
-            Decimal closePrice = timeSeries.getLastTick().getClosePrice();
-            Decimal maxValue = new MaxPriceIndicator(timeSeries).getValue(timeSeries.getEnd());
-            Decimal minValue = new MinPriceIndicator(timeSeries).getValue(timeSeries.getEnd());
-            Decimal volume = new VolumeIndicator(timeSeries).getValue(timeSeries.getEnd());
-            
-            Tick resultTick = new Tick(period, timeSeries.getLastTick().getEndTime(), openPrice, maxValue, minValue, closePrice, volume);
-            scaled.addTick(resultTick);
-        }
+        rebuild(child.getEnd());
     }
     
     public final void rebuild(int index) {
@@ -62,10 +48,12 @@ public class ScaledTimeSeries extends TimeSeries {
         TimeSeries subseries = child.subseries(0, index);
         List<TimeSeries> split = subseries.split(period);
         for (TimeSeries timeSeries : split) {
+            int timeFrame = timeSeries.getEnd() - timeSeries.getBegin() + 1;
+            
             Decimal openPrice = timeSeries.getFirstTick().getOpenPrice();
             Decimal closePrice = timeSeries.getLastTick().getClosePrice();
-            Decimal maxValue = new MaxPriceIndicator(timeSeries).getValue(timeSeries.getEnd());
-            Decimal minValue = new MinPriceIndicator(timeSeries).getValue(timeSeries.getEnd());
+            Decimal maxValue = new HighestValueIndicator(new MaxPriceIndicator(timeSeries), timeFrame).getValue(timeSeries.getEnd());
+            Decimal minValue = new LowestValueIndicator(new MinPriceIndicator(timeSeries), timeFrame).getValue(timeSeries.getEnd());
             Decimal volume = new VolumeIndicator(timeSeries).getValue(timeSeries.getEnd());
             
             Tick resultTick = new Tick(period, timeSeries.getLastTick().getEndTime(), openPrice, maxValue, minValue, closePrice, volume);

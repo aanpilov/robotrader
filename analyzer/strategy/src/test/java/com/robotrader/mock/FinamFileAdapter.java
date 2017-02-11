@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -31,10 +32,10 @@ import org.slf4j.LoggerFactory;
  */
 public class FinamFileAdapter implements AsyncAdapterService {
     private final Map<Long, ConditionalOrder> orders = new HashMap<>();
+    private TimeSeries series = new TimeSeries("base");
     private final Set<MockChartManager> chartManagers = new HashSet<>();
     private Portfolio portfolio;
     private long position = 0;
-    private int dealCounter = 0;
     
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final File file;
@@ -48,11 +49,25 @@ public class FinamFileAdapter implements AsyncAdapterService {
         return deals;
     }
     
+    public Optional<Order> getLiquidationOrder() {
+        if(position > 0) {
+            return Optional.of(Order.sellAt(series.getEnd(), series.getLastTick().getClosePrice(), Decimal.valueOf(position)));
+        }
+        
+        if(position < 0) {
+            return Optional.of(Order.buyAt(series.getEnd(), series.getLastTick().getClosePrice(), Decimal.valueOf(0-position)));
+        }
+        
+        return Optional.empty();
+    }
+    
     public void mockProcessTicks() throws Exception {
-        TimeSeries series = FinamCsvTicksLoader.loadSeries(file);
-        for (int i = 0; i <= series.getEnd(); i++) {
-            Tick tick = series.getTick(i);          
-            log.info("New tick: " + tick);
+        TimeSeries finamSeries = FinamCsvTicksLoader.loadSeries(file);
+        for (int i = 0; i <= finamSeries.getEnd(); i++) {
+            Tick tick = finamSeries.getTick(i);
+            
+            series.addTick(tick);
+            log.info("New Tick " + i + " : " + tick);
             matchOrders(tick);
             chartManagers.forEach(manager -> manager.addOnlineTick(tick));
         }
@@ -134,10 +149,10 @@ public class FinamFileAdapter implements AsyncAdapterService {
         Order deal = null;
         if(order.isBuy()) {
             position += order.getQuantity();
-            deal = Order.buyAt(dealCounter++, Decimal.valueOf(order.getPrice()), Decimal.valueOf(order.getQuantity()));
+            deal = Order.buyAt(series.getEnd(), Decimal.valueOf(order.getPrice()), Decimal.valueOf(order.getQuantity()));
         } else {
             position -= order.getQuantity();
-            deal = Order.sellAt(dealCounter++, Decimal.valueOf(order.getPrice()), Decimal.valueOf(order.getQuantity()));
+            deal = Order.sellAt(series.getEnd(), Decimal.valueOf(order.getPrice()), Decimal.valueOf(order.getQuantity()));
         }
         
         deals.add(deal);

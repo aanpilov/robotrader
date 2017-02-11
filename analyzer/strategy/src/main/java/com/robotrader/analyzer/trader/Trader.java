@@ -5,8 +5,13 @@
  */
 package com.robotrader.analyzer.trader;
 
+import com.robotrader.analyzer.chart.AsyncChartManager;
+import com.robotrader.analyzer.portfolio.AsyncPortfolioManager;
+import com.robotrader.analyzer.strategy.StrategyManager;
+import com.robotrader.core.objects.Security;
 import com.robotrader.core.objects.ServerStatus;
 import com.robotrader.core.service.AsyncAdapterService;
+import eu.verdelhan.ta4j.Decimal;
 import java.io.StringReader;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -23,8 +28,10 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
+import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ta4j.strategy.ReductionStrategy;
 
 /**
  *
@@ -123,7 +130,35 @@ public class Trader implements Processor {
             if(!connected) {
                 connected = true;
                 sendSmsMessage("Connected to server");
+                onConnected();
             }            
+        }
+    }
+    
+    private void onConnected() {
+        AsyncPortfolioManager portfolioManager = new AsyncPortfolioManager(camelContext);
+        portfolioManager.start();
+        
+        Security fut = new Security(null, null, "FUT", "SRH7");
+        AsyncChartManager futChartManager = new AsyncChartManager(camelContext, fut, Period.hours(1));
+        futChartManager.start();
+        
+        Security base = new Security(null, null, "TQBR", "SBER");
+        AsyncChartManager baseChartManager = new AsyncChartManager(camelContext, base, Period.hours(1));
+        baseChartManager.start();
+        
+        ReductionStrategy strategy = new ReductionStrategy(baseChartManager.getChart());
+        StrategyManager strategyManager = new StrategyManager(baseChartManager, strategy);
+        
+        StrategyTrader strategyTrader = new StrategyTrader(portfolioManager, futChartManager, strategyManager, adapterService, Decimal.valueOf(104), Decimal.valueOf(14));
+                
+        try{
+            adapterService.getHistory(base, Period.seconds(3600), 100);
+            adapterService.getHistory(fut, Period.seconds(3600), 10);
+            adapterService.subscribe(base);
+            adapterService.subscribe(fut);
+        } catch(Exception e) {
+            log.error("Error: ", e);
         }
     }
     
