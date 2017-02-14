@@ -25,6 +25,8 @@ public abstract class AbstractStrategyTrader implements StrategyListener, Portfo
     protected final Logger log = LoggerFactory.getLogger(getClass());
     protected final Portfolio portfolio;
     protected final ChartManager chartManager;
+    
+    private static final Decimal MIN_TICK_MODULE = Decimal.valueOf(0.005);
 
     public AbstractStrategyTrader(Portfolio portfolio, ChartManager chartManager, StrategyManager strategyManager) {
         this.portfolio = portfolio;
@@ -44,7 +46,12 @@ public abstract class AbstractStrategyTrader implements StrategyListener, Portfo
 
         try {
             if(portfolio.getPosition().isZero()) {
-                removeActiveOrders();
+                if(tick.getMaxPrice().minus(tick.getMinPrice()).dividedBy(tick.getClosePrice()).isLessThan(MIN_TICK_MODULE)) {
+                    //TickModule too low...
+                    return;
+                } else {
+                    removeActiveOrders();
+                }                
             }
             
             if (portfolio.getPosition().isPositive() && advice == Advice.EXIT_LONG) {
@@ -74,7 +81,7 @@ public abstract class AbstractStrategyTrader implements StrategyListener, Portfo
             log.error("Processing error", e);
             return;
         }
-    }
+    }    
 
     protected abstract void closePosition(Tick tick) throws Exception;
 
