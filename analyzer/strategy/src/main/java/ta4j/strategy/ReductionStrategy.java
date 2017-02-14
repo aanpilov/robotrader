@@ -29,9 +29,9 @@ public class ReductionStrategy extends SimpleStrategy {
     protected void initRules() {
         super.initRules();
         
-        StochasticOscillatorKIndicator stochIndicator = new StochasticOscillatorKIndicator(getTimeSeries(), 8);
-        SMAIndicator kIndicator = new SMAIndicator(stochIndicator, 5);
-        SMAIndicator dIndicator = new SMAIndicator(kIndicator, 3);
+        StochasticOscillatorKIndicator stochIndicator = new StochasticOscillatorKIndicator(getTimeSeries(), stochSize);
+        SMAIndicator kIndicator = new SMAIndicator(stochIndicator, kSmooth);
+        SMAIndicator dIndicator = new SMAIndicator(kIndicator, dSmooth);
         
         reduceLongRule = new OverIndicatorRule(kIndicator, Decimal.valueOf(80)).and(new OverIndicatorRule(dIndicator, Decimal.valueOf(80)));
         

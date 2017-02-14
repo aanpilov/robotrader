@@ -8,6 +8,8 @@ package ta4j.strategy;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Rule;
 import eu.verdelhan.ta4j.TimeSeries;
+import eu.verdelhan.ta4j.indicators.helpers.HighestValueIndicator;
+import eu.verdelhan.ta4j.indicators.helpers.LowestValueIndicator;
 import eu.verdelhan.ta4j.indicators.oscillators.StochasticOscillatorKIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
 import eu.verdelhan.ta4j.trading.rules.InPipeRule;
@@ -25,6 +27,11 @@ public class SimpleStrategy implements Strategy {
     private final TimeSeries timeSeries;
     private final ScaledTimeSeries parentTimeSeries;
     private int unstablePeriod;
+    
+    protected final int stochSize = 8;    
+    protected final int kSmooth = 5;    
+    protected final int dSmooth = 3;    
+    
     private Rule enterLongRule;
     private Rule enterShortRule;
     private Rule exitLongRule;    
@@ -53,17 +60,19 @@ public class SimpleStrategy implements Strategy {
                                .or(new UnderIndicatorRule(parentKIndicator, Decimal.valueOf(20)));
         ScaledRule parentShortEnterRuleWrapper = new ScaledRule(parentShortEnterRule, parentTimeSeries);
         
-        StochasticOscillatorKIndicator stochIndicator = new StochasticOscillatorKIndicator(timeSeries, 8);
-        SMAIndicator kIndicator = new SMAIndicator(stochIndicator, 5);
-        SMAIndicator dIndicator = new SMAIndicator(kIndicator, 3);        
+        StochasticOscillatorKIndicator stochIndicator = new StochasticOscillatorKIndicator(timeSeries, stochSize);
+        SMAIndicator kIndicator = new SMAIndicator(stochIndicator, kSmooth);
+        SMAIndicator dIndicator = new SMAIndicator(kIndicator, dSmooth);        
         
         enterLongRule = parentLongEnterRuleWrapper.and(new OverIndicatorRule(kIndicator, dIndicator)
-                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))));
+                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))))
+                        .and(new UnderIndicatorRule(new LowestValueIndicator(kIndicator, stochSize), Decimal.valueOf(50)));
         
         exitLongRule = new UnderIndicatorRule(kIndicator, dIndicator).and(new UnderIndicatorRule(kIndicator, Decimal.valueOf(80)));
         
         enterShortRule = parentShortEnterRuleWrapper.and(new UnderIndicatorRule(kIndicator, dIndicator)
-                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))));
+                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))))
+                        .and(new OverIndicatorRule(new HighestValueIndicator(kIndicator, stochSize), Decimal.valueOf(50)));
         
         exitShortRule = new OverIndicatorRule(kIndicator, dIndicator).and(new OverIndicatorRule(kIndicator, Decimal.valueOf(20)));
     }
