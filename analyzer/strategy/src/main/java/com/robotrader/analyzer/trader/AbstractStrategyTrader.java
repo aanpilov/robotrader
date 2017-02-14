@@ -26,7 +26,7 @@ public abstract class AbstractStrategyTrader implements StrategyListener, Portfo
     protected final Portfolio portfolio;
     protected final ChartManager chartManager;
     
-    private static final Decimal MIN_TICK_MODULE = Decimal.valueOf(0.005);
+    private static final Decimal MIN_TICK_MODULE = Decimal.valueOf(0);
 
     public AbstractStrategyTrader(Portfolio portfolio, ChartManager chartManager, StrategyManager strategyManager) {
         this.portfolio = portfolio;
