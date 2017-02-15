@@ -23,42 +23,105 @@ public class TradingRecordBuilder {
         
         return new TradingRecord(ordersArray);
     }
-
+    
     private static List<Order> normalizeOrders(Order[] orders) {
         List<Order> normalized = new ArrayList<>();
         
-        double currentPosition = 0;
+        Decimal currentPosition = Decimal.ZERO;
+        List<Order> increaseOrders = new ArrayList();
+        List<Order> reduceOrders = new ArrayList();
         for (int i = 0; i < orders.length; i++) {
             Order order = orders[i];
             
-            if(currentPosition == 0) {
-                normalized.add(order);
-                currentPosition = order.getAmount().toDouble();
+            Decimal amount = (order.isBuy())?order.getAmount():order.getAmount().multipliedBy(Decimal.valueOf(-1));
+            
+            if(currentPosition.isZero()) {
+                increaseOrders.add(order);
+                currentPosition = currentPosition.plus(amount);
                 continue;
             }
             
-            if(currentPosition == order.getAmount().toDouble()) {
-                normalized.add(order);
-                currentPosition = 0;
+            if(isOneSign(currentPosition, amount)) {
+                //One direction
+                currentPosition = currentPosition.plus(amount);
+                increaseOrders.add(order);
                 continue;
             }
             
-            double newPosition = order.getAmount().toDouble() - currentPosition;
-            if(currentPosition > 0) {
-                Order stopOrder = Order.sellAt(order.getIndex(), order.getPrice(), Decimal.valueOf(currentPosition));
-                Order newOrder = Order.sellAt(order.getIndex(), order.getPrice(), Decimal.valueOf(newPosition));
+            
+            //Diff direction
+            Decimal newPosition = currentPosition.plus(amount);
+            if(isOneSign(currentPosition, newPosition)) {
+                //Reduction
+                reduceOrders.add(order);
+                currentPosition = newPosition;
+                continue;
+            }
+            
+            if(newPosition.isZero()) {
+                reduceOrders.add(order);
+                currentPosition = newPosition;
                 
-                normalized.add(stopOrder);
-                normalized.add(newOrder);
+                Order increaseOrder = createAvgOrder(increaseOrders);
+                increaseOrders.clear();
+                Order reduceOrder = createAvgOrder(reduceOrders);
+                reduceOrders.clear();
+                
+                normalized.add(increaseOrder);
+                normalized.add(reduceOrder);
+                continue;
+            }
+            
+            //Change direction
+            Order newOrder = null;
+            if(currentPosition.isPositive()) {
+                Order stopOrder = Order.sellAt(order.getIndex(), order.getPrice(), currentPosition.abs());
+                reduceOrders.add(stopOrder);
+                
+                newOrder = Order.sellAt(order.getIndex(), order.getPrice(), newPosition);
             } else {
-                Order stopOrder = Order.buyAt(order.getIndex(), order.getPrice(), Decimal.valueOf(currentPosition).abs());
-                Order newOrder = Order.buyAt(order.getIndex(), order.getPrice(), Decimal.valueOf(newPosition).abs());
+                Order stopOrder = Order.buyAt(order.getIndex(), order.getPrice(), currentPosition.abs());
+                reduceOrders.add(stopOrder);
                 
-                normalized.add(stopOrder);
-                normalized.add(newOrder);
+                newOrder = Order.buyAt(order.getIndex(), order.getPrice(), newPosition);
             }
+            
+            Order increaseOrder = createAvgOrder(increaseOrders);
+            increaseOrders.clear();
+            Order reduceOrder = createAvgOrder(reduceOrders);
+            reduceOrders.clear();
+
+            increaseOrders.add(newOrder);
+            currentPosition = newPosition;
+            
+            normalized.add(increaseOrder);
+            normalized.add(reduceOrder);
         }
         
         return normalized;
+    }
+
+    private static boolean isOneSign(Decimal currentPosition, Decimal amount) {
+        return currentPosition.multipliedBy(amount).isPositive();
+    }
+
+    private static Order createAvgOrder(List<Order> increaseOrders) {
+        Decimal totalPrice = Decimal.ZERO;
+        Decimal totalAmount = Decimal.ZERO;
+        int lastIndex = 0;
+        
+        for (Order order : increaseOrders) {
+            Decimal amount = order.isBuy()?order.getAmount():order.getAmount().multipliedBy(Decimal.valueOf(-1));
+            totalAmount = totalAmount.plus(amount);
+            totalPrice = totalPrice.plus(amount.multipliedBy(order.getPrice()));
+            lastIndex = order.getIndex();
+        }
+        
+        Decimal price = totalPrice.dividedBy(totalAmount).abs();
+        if(totalAmount.isPositive()) {
+            return Order.buyAt(lastIndex, price, totalAmount.abs());
+        } else {
+            return Order.sellAt(lastIndex, price, totalAmount.abs());
+        }
     }
 }
