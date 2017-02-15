@@ -178,6 +178,6 @@ public class ConditionalOrder {
 
     @Override
     public String toString() {
-        return "ConditionalOrder{" + "orderId=" + orderId + ", type=" + type + ", price=" + price + ", quantity=" + quantity + ", condition=" + condition + ", conditionValue=" + conditionValue + '}';
+        return "ConditionalOrder{" + "orderId=" + orderId + ", status=" + status + ", type=" + type + ", price=" + price + ", quantity=" + quantity + ", condition=" + condition + ", conditionValue=" + conditionValue + '}';
     }
 }
