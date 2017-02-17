@@ -65,14 +65,12 @@ public class SimpleStrategy implements Strategy {
         SMAIndicator dIndicator = new SMAIndicator(kIndicator, dSmooth);        
         
         enterLongRule = parentLongEnterRuleWrapper.and(new OverIndicatorRule(kIndicator, dIndicator)
-                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))))
-                        .and(new UnderIndicatorRule(new LowestValueIndicator(kIndicator, stochSize), Decimal.valueOf(50)));
+                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))));
         
         exitLongRule = new UnderIndicatorRule(kIndicator, dIndicator).and(new UnderIndicatorRule(kIndicator, Decimal.valueOf(80)));
         
         enterShortRule = parentShortEnterRuleWrapper.and(new UnderIndicatorRule(kIndicator, dIndicator)
-                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))))
-                        .and(new OverIndicatorRule(new HighestValueIndicator(kIndicator, stochSize), Decimal.valueOf(50)));
+                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))));
         
         exitShortRule = new OverIndicatorRule(kIndicator, dIndicator).and(new OverIndicatorRule(kIndicator, Decimal.valueOf(20)));
     }

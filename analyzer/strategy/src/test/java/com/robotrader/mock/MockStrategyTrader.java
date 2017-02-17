@@ -151,10 +151,8 @@ public class MockStrategyTrader extends AbstractStrategyTrader {
         Decimal stopPrice;
         if(amount.isPositive()) {
             stopPrice = positionPrice.minus(positionPrice.multipliedBy(riskThreshold));
-            if(stopPrice.isLessThan(tick.getMinPrice()))stopPrice = tick.getMinPrice();
         } else {
             stopPrice = positionPrice.plus(positionPrice.multipliedBy(riskThreshold));
-            if(stopPrice.isGreaterThan(tick.getMaxPrice()))stopPrice = tick.getMaxPrice();
         }
                 
         return stopPrice;
