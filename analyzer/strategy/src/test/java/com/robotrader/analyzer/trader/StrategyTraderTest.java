@@ -16,6 +16,7 @@ import com.robotrader.mock.TradingRecordBuilder;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Order;
 import eu.verdelhan.ta4j.TradingRecord;
+import eu.verdelhan.ta4j.analysis.criteria.MaximumDrawdownCriterion;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
@@ -70,9 +71,10 @@ public class StrategyTraderTest {
         //Clear profit
 //        System.out.println("ClearProfit: " + new ClearProfitCriterion().calculate(orders));
         System.out.println("TotalProfit: " + new TotalProfitCriterion().calculate(chartManager.getChart(), tradingRecord));
+        System.out.println("MaximumDrawdown: " + new MaximumDrawdownCriterion().calculate(chartManager.getChart(), tradingRecord));
         System.out.println("Sharp: " + new SharpCriterion().calculate(chartManager.getChart(), tradingRecord));
 //        System.out.println("MaximumLossSeries: " + new MaximumLossSeries().calculate(tradingRecord));
-//        System.out.println("MaximumLossSeries: " + new MaximumLossSeries().calculate(tradingRecord).size());
+        System.out.println("MaximumLossSeries size: " + new MaximumLossSeries().calculate(tradingRecord).size());
         System.out.println("ProfitableTradesRatio: " + new ProfitableTradesRatio().calculate(tradingRecord));
     }
 }
