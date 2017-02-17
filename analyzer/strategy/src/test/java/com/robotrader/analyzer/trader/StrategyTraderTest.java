@@ -23,6 +23,7 @@ import org.joda.time.Period;
 import ta4j.analysis.criteria.ClearProfitCriterion;
 import ta4j.analysis.criteria.MaximumLossSeries;
 import ta4j.analysis.criteria.ProfitableTradesRatio;
+import ta4j.analysis.criteria.SharpCriterion;
 import ta4j.analysis.criteria.TotalProfitCriterion;
 import ta4j.strategy.ReductionStrategy;
 import ta4j.strategy.SimpleStrategy;
@@ -43,8 +44,8 @@ public class StrategyTraderTest {
         Portfolio portfolio = portfolioManager.getSecurityPortfolio(security);
         adapter.setPortfolio(portfolio);
         
-//        Strategy strategy = new SimpleStrategy(chartManager.getChart());
-        ReductionStrategy strategy = new ReductionStrategy(chartManager.getChart());
+        Strategy strategy = new SimpleStrategy(chartManager.getChart());
+//        ReductionStrategy strategy = new ReductionStrategy(chartManager.getChart());
         StrategyManager strategyManager = new StrategyManager(chartManager, strategy);
         
         MockStrategyTrader strategyTrader = new MockStrategyTrader(portfolioManager, chartManager, strategyManager, adapter, Decimal.valueOf(0.01), Decimal.valueOf(1000));
@@ -67,8 +68,11 @@ public class StrategyTraderTest {
         System.out.println("Trades size: " + tradingRecord.getTradeCount());
         
         //Clear profit
+//        System.out.println("ClearProfit: " + new ClearProfitCriterion().calculate(orders));
         System.out.println("TotalProfit: " + new TotalProfitCriterion().calculate(chartManager.getChart(), tradingRecord));
-        System.out.println("MaximumLossSeries: " + new MaximumLossSeries().calculate(tradingRecord));
+        System.out.println("Sharp: " + new SharpCriterion().calculate(chartManager.getChart(), tradingRecord));
+//        System.out.println("MaximumLossSeries: " + new MaximumLossSeries().calculate(tradingRecord));
+//        System.out.println("MaximumLossSeries: " + new MaximumLossSeries().calculate(tradingRecord).size());
         System.out.println("ProfitableTradesRatio: " + new ProfitableTradesRatio().calculate(tradingRecord));
     }
 }
