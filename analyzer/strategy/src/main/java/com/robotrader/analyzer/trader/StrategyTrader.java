@@ -15,6 +15,7 @@ import eu.verdelhan.ta4j.Tick;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -57,6 +58,7 @@ public class StrategyTrader extends AbstractStrategyTrader {
         Decimal price = (amount.isPositive())?tick.getMaxPrice():tick.getMinPrice();
         
         ConditionalOrder order = createOrder(amount, price);
+        log.info("New position order: " + order);
         tradeOrder(order);
         
         stopLevel = calculateStopPrice(tick, amount, price);
@@ -77,10 +79,10 @@ public class StrategyTrader extends AbstractStrategyTrader {
         ConditionalOrder reductionOrder = createOrder(amount, price);
         
         log.info("Reduction order: " + reductionOrder);
-//        adapterService.createConditionalOrder(reductionOrder);
-//        
-//        ConditionalOrder stopOrder = createStopOrder(Decimal.ZERO.minus(newPosition));
-//        adapterService.createConditionalOrder(stopOrder);
+        adapterService.createConditionalOrder(reductionOrder);
+        
+        ConditionalOrder stopOrder = createStopOrder(newPosition);
+        adapterService.createConditionalOrder(stopOrder);
     }
     
     @Override
@@ -106,10 +108,12 @@ public class StrategyTrader extends AbstractStrategyTrader {
         }
     }
     
-    private ConditionalOrder createStopOrder(Decimal amount) {
+    private ConditionalOrder createStopOrder(Decimal position) {
         if(stopLevel == null || stopLevel.isNaN()) {
             throw new RuntimeException("StopLevel not setted!!!");
         }
+        
+        Decimal amount = Decimal.ZERO.minus(position);
         
         ConditionalOrder stopOrder = createOrder(amount, stopLevel);
         log.info("Stop order: " + stopOrder);
@@ -149,10 +153,8 @@ public class StrategyTrader extends AbstractStrategyTrader {
         Decimal stopPrice;
         if(amount.isPositive()) {
             stopPrice = positionPrice.minus(positionPrice.multipliedBy(riskThreshold));
-            if(stopPrice.isLessThan(tick.getMinPrice()))stopPrice = tick.getMinPrice();
         } else {
             stopPrice = positionPrice.plus(positionPrice.multipliedBy(riskThreshold));
-            if(stopPrice.isGreaterThan(tick.getMaxPrice()))stopPrice = tick.getMaxPrice();
         }
                 
         return stopPrice;
@@ -161,9 +163,40 @@ public class StrategyTrader extends AbstractStrategyTrader {
     @Override
     public void positionChanged(Decimal position) {
         if(!position.isZero()) {
-            Decimal amount = Decimal.ZERO.minus(portfolio.getPosition());
-            ConditionalOrder stopOrder = createStopOrder(amount);
-            tradeOrder(stopOrder);
+            Optional<ConditionalOrder> existingOrder = searchStopOrder(position);
+            
+            if(!existingOrder.isPresent()) {
+                ConditionalOrder stopOrder = createStopOrder(position);
+                tradeOrder(stopOrder);                
+            } else if(stopLevel.isNaN()) {                
+                if(existingOrder.get().isBuy()) {
+                    stopLevel = Decimal.valueOf(existingOrder.get().getConditionValue()).minus(conditionSkip);
+                } else {
+                    stopLevel = Decimal.valueOf(existingOrder.get().getConditionValue()).plus(conditionSkip);
+                }
+                log.info("Stop level calculated: " + stopLevel);
+            }
         }
+    }
+
+    private Optional<ConditionalOrder> searchStopOrder(Decimal amount) {
+        ConditionalOrder result = null;
+        for (ConditionalOrder activeOrder : portfolio.getActiveOrders().values()) {
+            if(amount.isPositive() && activeOrder.isSell()) {
+                if(result == null || result.getPrice().compareTo(activeOrder.getPrice()) == -1) {
+                    result = activeOrder;
+                }
+            } else if(amount.isNegative() && activeOrder.isBuy()) {
+                if(result == null || result.getPrice().compareTo(activeOrder.getPrice()) == 1) {
+                    result = activeOrder;
+                }
+            }
+        }
+        
+        if(result == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(result);
+        }        
     }
 }

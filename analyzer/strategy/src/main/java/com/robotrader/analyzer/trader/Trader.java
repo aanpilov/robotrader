@@ -67,6 +67,8 @@ public class Trader implements Processor {
         consumers.add(consumer);
         consumer.start();
         
+        initStrategy();
+        
         connect();
     }
     
@@ -135,7 +137,7 @@ public class Trader implements Processor {
         }
     }
     
-    private void onConnected() {
+    private void initStrategy() throws Exception {
         AsyncPortfolioManager portfolioManager = new AsyncPortfolioManager(camelContext);
         portfolioManager.start();
         
@@ -150,8 +152,12 @@ public class Trader implements Processor {
         ReductionStrategy strategy = new ReductionStrategy(baseChartManager.getChart());
         StrategyManager strategyManager = new StrategyManager(baseChartManager, strategy);
         
-        StrategyTrader strategyTrader = new StrategyTrader(portfolioManager, futChartManager, strategyManager, adapterService, Decimal.valueOf(104), Decimal.valueOf(14));
-                
+        StrategyTrader strategyTrader = new StrategyTrader(portfolioManager, futChartManager, strategyManager, adapterService, Decimal.valueOf(0.01), Decimal.valueOf(14));
+    }
+    
+    private void onConnected() {
+        Security fut = new Security(null, null, "FUT", "SRH7");
+        Security base = new Security(null, null, "TQBR", "SBER");
         try{
             adapterService.getHistory(base, Period.seconds(3600), 100);
             adapterService.getHistory(fut, Period.seconds(3600), 10);
