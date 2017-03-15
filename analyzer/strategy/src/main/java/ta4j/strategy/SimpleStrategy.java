@@ -8,8 +8,6 @@ package ta4j.strategy;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Rule;
 import eu.verdelhan.ta4j.TimeSeries;
-import eu.verdelhan.ta4j.indicators.helpers.HighestValueIndicator;
-import eu.verdelhan.ta4j.indicators.helpers.LowestValueIndicator;
 import eu.verdelhan.ta4j.indicators.oscillators.StochasticOscillatorKIndicator;
 import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
 import eu.verdelhan.ta4j.trading.rules.InPipeRule;
@@ -25,7 +23,6 @@ import ta4j.rule.ScaledRule;
  */
 public class SimpleStrategy implements Strategy {
     private final TimeSeries timeSeries;
-    private final ScaledTimeSeries parentTimeSeries;
     private int unstablePeriod;
     
     protected final int stochSize = 8;    
@@ -38,14 +35,14 @@ public class SimpleStrategy implements Strategy {
     private Rule exitShortRule;    
     
     public SimpleStrategy(TimeSeries timeSeries) {
-        this.timeSeries = timeSeries;
-        parentTimeSeries = new ScaledTimeSeries("parent", timeSeries, Period.days(1));
+        this.timeSeries = timeSeries;        
         initRules();
     }
 
     protected void initRules() {
         unstablePeriod = 72;
         
+        ScaledTimeSeries parentTimeSeries = new ScaledTimeSeries("parent", timeSeries, Period.hours(2), 2);
         StochasticOscillatorKIndicator parentStochIndicator = new StochasticOscillatorKIndicator(parentTimeSeries, 5);        
         SMAIndicator parentKIndicator = new SMAIndicator(parentStochIndicator, 3);
         SMAIndicator parentDIndicator = new SMAIndicator(parentKIndicator, 3);
@@ -70,7 +67,7 @@ public class SimpleStrategy implements Strategy {
         exitLongRule = new UnderIndicatorRule(kIndicator, dIndicator).and(new UnderIndicatorRule(kIndicator, Decimal.valueOf(80)));
         
         enterShortRule = parentShortEnterRuleWrapper.and(new UnderIndicatorRule(kIndicator, dIndicator)
-                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))));
+                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))));                    
         
         exitShortRule = new OverIndicatorRule(kIndicator, dIndicator).and(new OverIndicatorRule(kIndicator, Decimal.valueOf(20)));
     }

@@ -25,12 +25,24 @@ import org.joda.time.Period;
  */
 public class ScaledTimeSeries extends TimeSeries {
     private final Period period;
+    private final Integer count;
+    private final boolean isPeriod;
     private final TimeSeries child;
     private TimeSeries scaled;
     
     public ScaledTimeSeries(String name, TimeSeries timeSeries, Period period) {
         super(name);
         this.period = period;
+        this.count = null;
+        this.isPeriod = true;
+        child = timeSeries;
+    }
+    
+    public ScaledTimeSeries(String name, TimeSeries timeSeries, Period period, Integer count) {
+        super(name);
+        this.period = period;
+        this.count = count;
+        this.isPeriod = false;
         child = timeSeries;
     }
     
@@ -46,7 +58,13 @@ public class ScaledTimeSeries extends TimeSeries {
         }
         
         TimeSeries subseries = child.subseries(0, index);
-        List<TimeSeries> split = subseries.split(period);
+        
+        List<TimeSeries> split = null;
+        if(isPeriod) {
+            split = subseries.split(period);
+        } else {
+            split = subseries.split(count);
+        }
         for (TimeSeries timeSeries : split) {
             int timeFrame = timeSeries.getEnd() - timeSeries.getBegin() + 1;
             
