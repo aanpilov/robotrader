@@ -42,7 +42,7 @@ public class SimpleStrategy implements Strategy {
     protected void initRules() {
         unstablePeriod = 72;
         
-        ScaledTimeSeries parentTimeSeries = new ScaledTimeSeries("parent", timeSeries, Period.hours(4), 4);
+        ScaledTimeSeries parentTimeSeries = new ScaledTimeSeries("parent", timeSeries, Period.days(1));
         StochasticOscillatorKIndicator parentStochIndicator = new StochasticOscillatorKIndicator(parentTimeSeries, 5);        
         SMAIndicator parentKIndicator = new SMAIndicator(parentStochIndicator, 3);
         SMAIndicator parentDIndicator = new SMAIndicator(parentKIndicator, 3);
