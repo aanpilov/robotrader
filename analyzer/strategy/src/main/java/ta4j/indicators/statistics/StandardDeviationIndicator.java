@@ -8,6 +8,7 @@ package ta4j.indicators.statistics;
 import eu.verdelhan.ta4j.Decimal;
 import eu.verdelhan.ta4j.Indicator;
 import eu.verdelhan.ta4j.indicators.CachedIndicator;
+import eu.verdelhan.ta4j.indicators.trackers.SMAIndicator;
 
 /**
  *
@@ -16,9 +17,9 @@ import eu.verdelhan.ta4j.indicators.CachedIndicator;
 public class StandardDeviationIndicator extends CachedIndicator<Decimal> {
     private VarianceIndicator variance;
 
-    public StandardDeviationIndicator(Indicator<Decimal> baseIndicator, Indicator<Decimal> indicator, int timeFrame) {
+    public StandardDeviationIndicator(Indicator<Decimal> baseIndicator, int timeFrame) {
         super(baseIndicator);
-        this.variance = new VarianceIndicator(baseIndicator, indicator, timeFrame);
+        this.variance = new VarianceIndicator(baseIndicator, new SMAIndicator(baseIndicator, timeFrame), timeFrame);
     }
 
     @Override
