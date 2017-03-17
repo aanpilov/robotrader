@@ -66,9 +66,11 @@ public class SimpleStrategy implements Strategy {
         Rule shiftLongRule = new OverIndicatorRule(shiftKIndicator, shiftDIndicator)
                 .and(new InPipeRule(shiftKIndicator, Decimal.valueOf(80), Decimal.valueOf(20)))
                 .or(new OverIndicatorRule(shiftKIndicator, Decimal.valueOf(80)));
+        Rule shiftExitLongRule = new UnderIndicatorRule(shiftKIndicator, shiftDIndicator).and(new UnderIndicatorRule(shiftKIndicator, Decimal.valueOf(80)));
         Rule shiftShortRule = new UnderIndicatorRule(shiftKIndicator, shiftDIndicator)
                 .and(new InPipeRule(shiftKIndicator, Decimal.valueOf(80), Decimal.valueOf(20)))
                 .or(new UnderIndicatorRule(shiftKIndicator, Decimal.valueOf(20)));
+        Rule shiftExitShortRule = new OverIndicatorRule(shiftKIndicator, shiftDIndicator).and(new OverIndicatorRule(shiftKIndicator, Decimal.valueOf(20)));
         
         StochasticOscillatorKIndicator stochIndicator = new StochasticOscillatorKIndicator(timeSeries, stochSize);
         SMAIndicator kIndicator = new SMAIndicator(stochIndicator, kSmooth);
@@ -76,11 +78,11 @@ public class SimpleStrategy implements Strategy {
         
         enterLongRule = parentLongEnterRuleWrapper.and(shiftLongRule);
         
-        exitLongRule = new UnderIndicatorRule(kIndicator, dIndicator).and(new UnderIndicatorRule(kIndicator, Decimal.valueOf(80)));
+        exitLongRule = shiftExitLongRule;
         
         enterShortRule = parentShortEnterRuleWrapper.and(shiftShortRule);
         
-        exitShortRule = new OverIndicatorRule(kIndicator, dIndicator).and(new OverIndicatorRule(kIndicator, Decimal.valueOf(20)));
+        exitShortRule = shiftExitShortRule;
     }
     
     protected boolean shouldEnterLong(int index) {
