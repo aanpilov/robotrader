@@ -15,6 +15,7 @@ import eu.verdelhan.ta4j.trading.rules.OverIndicatorRule;
 import eu.verdelhan.ta4j.trading.rules.UnderIndicatorRule;
 import org.joda.time.Period;
 import ta4j.ScaledTimeSeries;
+import ta4j.ShiftedTimeSeries;
 import ta4j.rule.ScaledRule;
 
 /**
@@ -57,17 +58,27 @@ public class SimpleStrategy implements Strategy {
                                .or(new UnderIndicatorRule(parentKIndicator, Decimal.valueOf(20)));
         ScaledRule parentShortEnterRuleWrapper = new ScaledRule(parentShortEnterRule, parentTimeSeries);
         
+        ShiftedTimeSeries shiftTimeSeries = new ShiftedTimeSeries("shift", timeSeries);
+        StochasticOscillatorKIndicator shiftStochIndicator = new StochasticOscillatorKIndicator(shiftTimeSeries, stochSize);
+        SMAIndicator shiftKIndicator = new SMAIndicator(shiftStochIndicator, kSmooth);
+        SMAIndicator shiftDIndicator = new SMAIndicator(shiftKIndicator, dSmooth);  
+        
+        Rule shiftLongRule = new OverIndicatorRule(shiftKIndicator, shiftDIndicator)
+                .and(new InPipeRule(shiftKIndicator, Decimal.valueOf(80), Decimal.valueOf(20)))
+                .or(new OverIndicatorRule(shiftKIndicator, Decimal.valueOf(80)));
+        Rule shiftShortRule = new UnderIndicatorRule(shiftKIndicator, shiftDIndicator)
+                .and(new InPipeRule(shiftKIndicator, Decimal.valueOf(80), Decimal.valueOf(20)))
+                .or(new UnderIndicatorRule(shiftKIndicator, Decimal.valueOf(20)));
+        
         StochasticOscillatorKIndicator stochIndicator = new StochasticOscillatorKIndicator(timeSeries, stochSize);
         SMAIndicator kIndicator = new SMAIndicator(stochIndicator, kSmooth);
         SMAIndicator dIndicator = new SMAIndicator(kIndicator, dSmooth);        
         
-        enterLongRule = parentLongEnterRuleWrapper.and(new OverIndicatorRule(kIndicator, dIndicator)
-                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))));
+        enterLongRule = parentLongEnterRuleWrapper.and(shiftLongRule);
         
         exitLongRule = new UnderIndicatorRule(kIndicator, dIndicator).and(new UnderIndicatorRule(kIndicator, Decimal.valueOf(80)));
         
-        enterShortRule = parentShortEnterRuleWrapper.and(new UnderIndicatorRule(kIndicator, dIndicator)
-                        .and(new InPipeRule(kIndicator, Decimal.valueOf(80), Decimal.valueOf(20))));                    
+        enterShortRule = parentShortEnterRuleWrapper.and(shiftShortRule);
         
         exitShortRule = new OverIndicatorRule(kIndicator, dIndicator).and(new OverIndicatorRule(kIndicator, Decimal.valueOf(20)));
     }
